@@ -25,15 +25,10 @@ class KvizAdapter(private var kvizovi : List<Kviz>) : RecyclerView.Adapter<KvizA
         holder.kvizNazivPredmeta.text = kvizovi[position].nazivPredmeta
         holder.kvizNaziv.text = kvizovi[position].naziv
         holder.kvizBodovi.text = kvizovi[position].osvojeniBodovi.toString()
-        // TODO provjeriti Datume i odreditii stanje kviza
         holder.kvizTrajanje.text = kvizovi[position].trajanje.toString() +" min"
-
         odrediTipKviza(kvizovi[position]).also {
             postaviSlikuIDatum(it, holder, kvizovi[position])
         }
-
-//        holder.kvizDatum.text = kvizovi[position].datumPocetka.toString()
-
     }
 
     override fun getItemCount(): Int {
@@ -61,7 +56,7 @@ class KvizAdapter(private var kvizovi : List<Kviz>) : RecyclerView.Adapter<KvizA
             // nema bodove i now je poslije datum kraj - crvena  kviz koji je prošao, a nije urađen.
             if(Calendar.getInstance().time.after(kviz.datumKraj)) return 4
             //nema bodove i datum rada + minute je prije datum kraja - zelena kviz koji je aktivan, ali nije urađen,
-            return 2;
+            if(kviz.datumPocetka.before(Calendar.getInstance().time) && kviz.datumKraj.after(Calendar.getInstance().time)) return 2
         }
         return 0
     }
@@ -73,21 +68,25 @@ class KvizAdapter(private var kvizovi : List<Kviz>) : RecyclerView.Adapter<KvizA
             id=context.getResources()
                     .getIdentifier("plava", "drawable", context.getPackageName())
             dateFormat  = DateFormat.getDateInstance(DateFormat.DATE_FIELD).format(kviz.datumRada)
+            holder.kvizBodovi.text = kviz.osvojeniBodovi.toString()
         }
         else if (tip==2){
             id=context.getResources()
                     .getIdentifier("zelena", "drawable", context.getPackageName())
             dateFormat  = DateFormat.getDateInstance(DateFormat.DATE_FIELD).format(kviz.datumKraj)
+            holder.kvizBodovi.text = " "
         }
         else if (tip == 3){
             id=context.getResources()
                     .getIdentifier("zuta", "drawable", context.getPackageName())
             dateFormat  = DateFormat.getDateInstance(DateFormat.DATE_FIELD).format(kviz.datumPocetka)
+            holder.kvizBodovi.text = " "
         }
         else if (tip == 4){
             id=context.getResources()
                     .getIdentifier("crvena", "drawable", context.getPackageName())
             dateFormat  = DateFormat.getDateInstance(DateFormat.DATE_FIELD).format(kviz.datumKraj)
+            holder.kvizBodovi.text = " "
         }
         holder.image.setImageResource(id)
         holder.kvizDatum.text = dateFormat
