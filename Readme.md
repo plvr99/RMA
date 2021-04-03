@@ -8,7 +8,7 @@ Ne mijenjajte naziv aplikacije niti početnih paketa.
 
 | Ime i prezime  | Index  | Grupa     |
 |----------------|--------|-----------|
-| Neko Nekić     | 12345  | PON 09:00 |
+| Adnan Palavra  | 18757  | PON 10:30 |
 
 &nbsp;
 
