@@ -29,7 +29,7 @@ class KvizRepository {
                     Kviz("Kviz 1","DM", createDate(2021, 5,15),createDate(2021, 5,15), createDate(2021, 5,15), 5,"DM grupa 1", null),
                     Kviz("Kviz 1","OBP", createDate(2021, 4,2),createDate(2021, 4,2), Calendar.getInstance().time, 5,"OBP grupa 1", null),
                     Kviz("Kviz 1","RMA", createDate(2012, 3,15),createDate(2021, 3,15), createDate(2021, 3,15), 15,"RMA grupa 1", 2f),
-                    Kviz("Kviz 1","IEK", createDate(2012, 4,10),createDate(2021, 4,10), createDate(2021, 4,10), 10,"IEK grupa 1", 0.5f)
+                    Kviz("Kviz 1","IEK", createDate(2012, 4,1),createDate(2021, 4,1), createDate(2021, 4,1), 10,"IEK grupa 1", 0.5f)
 
             )
         }

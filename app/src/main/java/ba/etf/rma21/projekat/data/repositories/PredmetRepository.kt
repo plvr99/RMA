@@ -13,12 +13,13 @@ class PredmetRepository {
             predmeti = arrayListOf(Predmet("ASP",2), Predmet("OOAD",2), Predmet("OE",1), Predmet("IM1", 1))
         }
         fun getUpisani(): List<Predmet> {
-            return upisaniPredmeti;
+            return upisaniPredmeti
         }
 
         fun getAll(): List<Predmet> {
             return predmeti + upisaniPredmeti
         }
+
         // TODO: Implementirati i ostale potrebne metode
     }
 
