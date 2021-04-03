@@ -11,43 +11,51 @@ class KvizRepository {
     companion object {
         // TODO: Implementirati
         var kvizovi : List<Kviz>
+        var mojiKvizovi : List<Kviz>
         fun create() : KvizRepository = KvizRepository()
         init {
             // TODO: Implementirati
             kvizovi = arrayListOf(
                     Kviz("Kviz 1","IM1", createDate(2021, 3, 2), createDate(2021, 3, 2), createDate(2021, 3, 2), 2, "Grupa1",null),
-            Kviz("Kviz 2","IM1", createDate(2021, 4, 1), createDate(2021, 8,2), createDate(2021, 8, 3), 3, "Grupa2",null),
-            Kviz("Kviz 1","ASP",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 2, "Grupa1",2f),
-            Kviz("Kviz 2","ASP",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 5, "Grupa1",null),
-            Kviz("Kviz 1","OE", createDate(2021, 9,10), createDate(2021, 9,10), createDate(2021, 9,10) ,4, "Grupa1",null),
-            Kviz("Kviz 1","OOAD",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 2, "Grupa1",0f),
-            Kviz("Kviz 2","OOAD",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 2, "Grupa2",0f))
+                    Kviz("Kviz 2","IM1", createDate(2021, 4, 1), createDate(2021, 8,2), createDate(2021, 8, 3), 3, "Grupa2",null),
+                    Kviz("Kviz 1","ASP",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 2, "Grupa1",2f),
+                    Kviz("Kviz 2","ASP",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 5, "Grupa1",null),
+                    Kviz("Kviz 1","OE", createDate(2021, 9,10), createDate(2021, 9,10), createDate(2021, 9,10) ,4, "Grupa1",null),
+                    Kviz("Kviz 1","OE", Calendar.getInstance().time, createDate(2021,5,22), createDate(2021,5,22) ,4, "Grupa2",null),
+                    Kviz("Kviz 1","OOAD",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 2, "Grupa1",0f),
+                    Kviz("Kviz 2","OOAD",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 2, "Grupa2",0f))
 
+            mojiKvizovi = arrayListOf(
+                    Kviz("Kviz 1","DM", createDate(2021, 5,15),createDate(2021, 5,15), createDate(2021, 5,15), 5,"DM grupa 1", null),
+                    Kviz("Kviz 1","OBP", createDate(2021, 4,2),createDate(2021, 4,2), Calendar.getInstance().time, 5,"OBP grupa 1", null),
+                    Kviz("Kviz 1","RMA", createDate(2012, 3,15),createDate(2021, 3,15), createDate(2021, 3,15), 15,"RMA grupa 1", 2f),
+                    Kviz("Kviz 1","IEK", createDate(2012, 4,10),createDate(2021, 4,10), createDate(2021, 4,10), 10,"IEK grupa 1", 0.5f)
+
+            )
         }
 
         fun getMyKvizes(): List<Kviz> {
             // TODO: Implementirati
-            return emptyList()
+            return mojiKvizovi
         }
 
         fun getAll(): List<Kviz> {
-            // TODO: Implementirati
-            return kvizovi
+
+            return kvizovi + mojiKvizovi
         }
 
         fun getDone(): List<Kviz> {
-            // TODO: Implementirati
-            return kvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz)==1 }
+            return getAll().filter { kviz: Kviz -> odrediTipKviza(kviz)==1 }
         }
 
         fun getFuture(): List<Kviz> {
             // TODO: Implementirati
-            return kvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz) == 3 }
+            return getAll().filter { kviz: Kviz -> odrediTipKviza(kviz) == 3 }
         }
 
         fun getNotTaken(): List<Kviz> {
             // TODO: Implementirati
-            return kvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz)== 4 }
+            return getAll().filter { kviz: Kviz -> odrediTipKviza(kviz)== 4 }
         }
         // TODO: Implementirati i ostale potrebne metode
         fun createDate(year : Int, month: Int, day : Int) : Date{
