@@ -4,7 +4,8 @@ import ba.etf.rma21.projekat.data.models.Grupa
 
 class GrupaRepository {
     companion object {
-        private var grupe : ArrayList<Grupa> = arrayListOf();
+        var grupe : ArrayList<Grupa> = arrayListOf()
+        var upisanegrupe : ArrayList<Grupa>
         fun create() : GrupaRepository = GrupaRepository()
         init {
             // TODO: Implementirati
@@ -21,11 +22,16 @@ class GrupaRepository {
             grupe.add(Grupa("OBP grupa 1", "OBP"))
             grupe.add(Grupa("RMA grupa 1",  "RMA"))
             grupe.add(Grupa("IEK grupa 1", "IEK"))
+
+            upisanegrupe = arrayListOf(grupe.get(8), grupe.get(9), grupe.get(10),grupe.get(11))
         }
 
         fun getGroupsByPredmet(nazivPredmeta: String): List<Grupa> {
-            val rez = grupe.filter { grupa -> grupa.nazivPredmeta.equals(nazivPredmeta) }
+            val rez = grupe.filter { grupa -> grupa.nazivPredmeta.equals( nazivPredmeta )}
             return rez
+        }
+        fun dajNeupisaneGrupe(): List<Grupa> {
+            return grupe.filter { grupa -> !grupe.contains(grupa) }
         }
     }
 }
