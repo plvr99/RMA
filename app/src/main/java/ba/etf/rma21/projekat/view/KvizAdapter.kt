@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ba.etf.rma21.projekat.R
 import ba.etf.rma21.projekat.data.models.Kviz
 import java.text.DateFormat
+import java.text.SimpleDateFormat
 import java.time.LocalDateTime
 import java.util.*
 
@@ -62,30 +63,31 @@ class KvizAdapter(private var kvizovi : List<Kviz>) : RecyclerView.Adapter<KvizA
     }
     private fun postaviSlikuIDatum(tip : Int , holder: KvizViewHolder, kviz : Kviz){
         val context: Context = holder.image.getContext()
-        var id : Int = 0
+        var id = 0
+        val sd = SimpleDateFormat("dd.MM.yyyy")
         var dateFormat  = DateFormat.getDateInstance(DateFormat.DATE_FIELD).format(kviz.datumPocetka)
         if(tip==1){
             id=context.getResources()
                     .getIdentifier("plava", "drawable", context.getPackageName())
-            dateFormat  = DateFormat.getDateInstance(DateFormat.DATE_FIELD).format(kviz.datumRada)
+            dateFormat = sd.format(kviz.datumRada)
             holder.kvizBodovi.text = kviz.osvojeniBodovi.toString()
         }
         else if (tip==2){
             id=context.getResources()
                     .getIdentifier("zelena", "drawable", context.getPackageName())
-            dateFormat  = DateFormat.getDateInstance(DateFormat.DATE_FIELD).format(kviz.datumKraj)
+            dateFormat = sd.format(kviz.datumKraj)
             holder.kvizBodovi.text = " "
         }
         else if (tip == 3){
             id=context.getResources()
                     .getIdentifier("zuta", "drawable", context.getPackageName())
-            dateFormat  = DateFormat.getDateInstance(DateFormat.DATE_FIELD).format(kviz.datumPocetka)
+            dateFormat = sd.format(kviz.datumPocetka)
             holder.kvizBodovi.text = " "
         }
         else if (tip == 4){
             id=context.getResources()
                     .getIdentifier("crvena", "drawable", context.getPackageName())
-            dateFormat  = DateFormat.getDateInstance(DateFormat.DATE_FIELD).format(kviz.datumKraj)
+            dateFormat = sd.format(kviz.datumKraj)
             holder.kvizBodovi.text = " "
         }
         holder.image.setImageResource(id)
