@@ -2,82 +2,104 @@ package ba.etf.rma21.projekat
 
 import android.os.Bundle
 import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Button
-import android.widget.Spinner
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.get
+import androidx.core.view.isVisible
 import ba.etf.rma21.projekat.data.models.Grupa
 import ba.etf.rma21.projekat.data.models.Predmet
-import ba.etf.rma21.projekat.data.repositories.PredmetRepository
 import ba.etf.rma21.projekat.viewmodel.NajjaciViewModelNaSvijetu
 
 class UpisPredmet : AppCompatActivity() {
-    private var kvizViewModel : NajjaciViewModelNaSvijetu = NajjaciViewModelNaSvijetu()
+    var kvizModel : NajjaciViewModelNaSvijetu = NajjaciViewModelNaSvijetu()
+    lateinit var spinnerGodina : Spinner
+    lateinit var button : Button
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_upis_predmet)
-        val spinnerGodina : Spinner = findViewById(R.id.spinner2)
         val spinnerPredmet : Spinner = findViewById(R.id.spinner3)
         val spinnerGrupa : Spinner = findViewById(R.id.spinner4)
-        val kvizModel : NajjaciViewModelNaSvijetu? = intent.getParcelableExtra("model")
-        ArrayAdapter.createFromResource(
-                this,
-                R.array.godina_choice_array,
-                android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            // Specify the layout to use when the list of choices appears
+        spinnerGodina = findViewById(R.id.spinner2)
+        button = findViewById(R.id.button)
+        var predmetChoiceList : List<Predmet> = arrayListOf()
+        var groupChoiceList : List<Grupa> = arrayListOf()
+
+        ArrayAdapter.createFromResource(this, R.array.godina_choice_array, android.R.layout.simple_spinner_item).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            // Apply the adapter to the spinner
             spinnerGodina.adapter = adapter
         }
 
-        var predmetChoiceList : List<Predmet> = arrayListOf()
-        var groupChoice : List<Grupa> = arrayListOf()
         val adapterPredmet: ArrayAdapter<Predmet> = ArrayAdapter(this, android.R.layout.simple_spinner_item, predmetChoiceList).also {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
-        val adapterGrupa: ArrayAdapter<Grupa> = ArrayAdapter(this, android.R.layout.simple_spinner_item, groupChoice).also {
+        val adapterGrupa: ArrayAdapter<Grupa> = ArrayAdapter(this, android.R.layout.simple_spinner_item, groupChoiceList).also {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
-        spinnerPredmet.adapter = adapterPredmet
 
+        spinnerPredmet.adapter = adapterPredmet
+        spinnerGrupa.adapter = adapterGrupa
+        println("GODINAAAAAAAAAAAAAAAAAAAAAAA " + NajjaciViewModelNaSvijetu.Companion.odabranaGodina)
+
+
+        //todo updateat druga 2 spinnera ZBOG BUTTONA
+
+        spinnerGodina.setSelection(NajjaciViewModelNaSvijetu.Companion.odabranaGodina-1)
         spinnerGodina.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                predmetChoiceList = kvizViewModel.dajSvePredmeteZaGodinu(position + 1)
+                predmetChoiceList = kvizModel.dajNeupisanePredmete().filter { predmet -> predmet.godina.equals(position + 1)}
                 adapterPredmet.clear()
-                adapterPredmet.addAll(predmetChoiceList)
+                if(predmetChoiceList.size==0) adapterPredmet.clear()
+                else adapterPredmet.addAll(predmetChoiceList)
                 adapterPredmet.notifyDataSetChanged()
             }
-
             override fun onNothingSelected(parent: AdapterView<*>?) {
-                TODO("Not yet implemented")
             }
         }
-        spinnerGrupa.adapter = adapterGrupa
+
         spinnerPredmet.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                var predmet : String = spinnerPredmet.getItemAtPosition(position).toString()
-                println(spinnerPredmet.getItemAtPosition(position).toString())
-                groupChoice = kvizViewModel.dajSveGrupeZaPredmet(predmet)
+                val predmet : String = spinnerPredmet.getItemAtPosition(position).toString()
+                groupChoiceList = kvizModel.dajSveGrupeZaPredmet(predmet)
                 adapterGrupa.clear()
-                adapterGrupa.addAll(groupChoice)
+                adapterGrupa.addAll(groupChoiceList)
                 adapterGrupa.notifyDataSetChanged()
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
-
+                adapterGrupa.clear()
+                adapterGrupa.notifyDataSetChanged()
+                button.isVisible = false
             }
         }
-        val button : Button = findViewById(R.id.button)
-        button.setOnClickListener(){
+
+        spinnerGodina.performItemClick(spinnerGodina.getChildAt(NajjaciViewModelNaSvijetu.odabranaGodina),
+                NajjaciViewModelNaSvijetu.odabranaGodina, spinnerGodina.adapter.getItemId(NajjaciViewModelNaSvijetu.odabranaGodina))
+        button.setOnClickListener {
             upisiNaPredmet(spinnerGodina.selectedItemPosition, spinnerPredmet.selectedItem.toString(), spinnerGrupa.selectedItem.toString())
+            NajjaciViewModelNaSvijetu.Companion.odabranaGodina = spinnerGodina.selectedItem.toString().toInt()
+            finish()
         }
 
+        spinnerGrupa.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                button.isVisible=true
+            }
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                button.isVisible=false
+            }
+        }
     }
 
     private fun upisiNaPredmet(godina : Int, predmet: String, grupa: String) {
-        //todo
+        val godinaPredmeta = godina + 1
+        println(""+godinaPredmeta + predmet+ grupa)
+        kvizModel.upisiNaPredmet(godinaPredmeta, predmet, grupa)
+        Toast.makeText(this, "Upisan", Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onBackPressed() {
+        super.onBackPressed()
+        //println(spinnerGodina.selectedItem.toString().toInt())
+        NajjaciViewModelNaSvijetu.Companion.odabranaGodina = spinnerGodina.selectedItem.toString().toInt()
+        println("POSTAVIO " + NajjaciViewModelNaSvijetu.Companion.odabranaGodina)
     }
 }
