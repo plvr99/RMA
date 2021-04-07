@@ -5,13 +5,13 @@
         <item>Svi kvizovi</item>
         <item>Urađeni kvizovi</item>
         <item>Budući kvizovi</item>
-        <item>Prošli kvizovi (neurađeni)</item>
+        <item>Prošli kvizovi</item>
     </string-array>
     <string-array name="godina_choice_array">
-        <item>1. godina</item>
-        <item>2. godina</item>
-        <item>3. godina</item>
-        <item>4. godina</item>
-        <item>5. godina</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
     </string-array>
 </resources>
