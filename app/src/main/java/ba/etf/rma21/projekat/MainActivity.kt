@@ -9,31 +9,27 @@ import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import ba.etf.rma21.projekat.data.models.Kviz
-import ba.etf.rma21.projekat.data.repositories.KvizRepository
 import ba.etf.rma21.projekat.view.KvizAdapter
-import ba.etf.rma21.projekat.viewmodel.NajjaciViewModelNaSvijetu
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import ba.etf.rma21.projekat.viewmodel.KvizViewModel
 import java.text.FieldPosition
-import java.util.*
 
 
 class MainActivity : AppCompatActivity(){
     private lateinit var kvizoviRecyclerView: RecyclerView
     private lateinit var kvizAdapter: KvizAdapter
     private lateinit var spinner: Spinner
-    private var kvizViewModel : NajjaciViewModelNaSvijetu = NajjaciViewModelNaSvijetu()
+    private var kvizViewModel : KvizViewModel = KvizViewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        kvizoviRecyclerView = findViewById(R.id.kvizoviRecyclerView)
+        kvizoviRecyclerView = findViewById(R.id.listaKvizova)
         kvizoviRecyclerView.layoutManager = GridLayoutManager(this,2,RecyclerView.VERTICAL,false)
 
         kvizAdapter = KvizAdapter(kvizViewModel.getAll())
         kvizoviRecyclerView.adapter = kvizAdapter
 
-        spinner = findViewById(R.id.spinner)
+        spinner = findViewById(R.id.filterKvizova)
         ArrayAdapter.createFromResource(this, R.array.spinner_choice_array, android.R.layout.simple_spinner_item).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.adapter = adapter
@@ -45,14 +41,12 @@ class MainActivity : AppCompatActivity(){
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
-        val floatingActionButton : View = findViewById(R.id.floatingActionButton2)
+        val floatingActionButton : View = findViewById(R.id.upisDugme)
         floatingActionButton.setOnClickListener{dodajPredmet()}
     }
 
     override fun onRestart() {
-        println("RESTART!!!!!!")
-            prikaziKvizoveSaOpcijom(spinner.selectedItemPosition)
-        println("ODABRANA GODINA JE " + NajjaciViewModelNaSvijetu.Companion.odabranaGodina)
+        prikaziKvizoveSaOpcijom(spinner.selectedItemPosition)
         super.onRestart()
     }
 
@@ -62,18 +56,14 @@ class MainActivity : AppCompatActivity(){
         }
         startActivity(intent)
     }
+
     fun prikaziKvizoveSaOpcijom(position: Int){
         when(position){
-            0 -> {kvizAdapter = KvizAdapter(kvizViewModel.getMyKvizes().sortedBy { kviz -> kviz.datumPocetka })
-                kvizoviRecyclerView.adapter = kvizAdapter}
-            1 -> {kvizAdapter = KvizAdapter(kvizViewModel.getAll().sortedBy { kviz -> kviz.datumPocetka })
-                kvizoviRecyclerView.adapter = kvizAdapter}
-            2 -> {kvizAdapter = KvizAdapter(kvizViewModel.getDone().sortedBy { kviz -> kviz.datumPocetka })
-                kvizoviRecyclerView.adapter = kvizAdapter}
-            3 -> {kvizAdapter = KvizAdapter(kvizViewModel.getFuture().sortedBy { kviz -> kviz.datumPocetka })
-                kvizoviRecyclerView.adapter = kvizAdapter}
-            4 -> {kvizAdapter = KvizAdapter(kvizViewModel.getNotTaken().sortedBy { kviz -> kviz.datumPocetka })
-                kvizoviRecyclerView.adapter = kvizAdapter}
+            0 ->{kvizAdapter.updateList(kvizViewModel.getMyKvizes().sortedBy { kviz -> kviz.datumPocetka })}
+            1 ->{kvizAdapter.updateList(kvizViewModel.getAll().sortedBy { kviz -> kviz.datumPocetka })}
+            2 ->{kvizAdapter.updateList(kvizViewModel.getDone().sortedBy { kviz -> kviz.datumPocetka })}
+            3 ->{kvizAdapter.updateList(kvizViewModel.getFuture().sortedBy { kviz -> kviz.datumPocetka })}
+            4 ->{kvizAdapter.updateList(kvizViewModel.getNotTaken().sortedBy { kviz -> kviz.datumPocetka })}
         }
     }
 
