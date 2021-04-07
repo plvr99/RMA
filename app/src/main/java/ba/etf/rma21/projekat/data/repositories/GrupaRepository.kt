@@ -6,17 +6,14 @@ class GrupaRepository {
     companion object {
         var grupe : ArrayList<Grupa> = arrayListOf()
         var upisanegrupe : ArrayList<Grupa>
-        fun create() : GrupaRepository = GrupaRepository()
         init {
-            // TODO: Implementirati
-            val grupa : Grupa = Grupa("Grupa 1" , "IM1")
-            grupe.add(grupa)
+            grupe.add(Grupa("Grupa 1" , "IM1"))
             grupe.add(Grupa("Grupa 2" , "IM1"))
             grupe.add(Grupa("Grupa 1" , "ASP"))
             grupe.add(Grupa("Grupa 2" , "ASP"))
             grupe.add(Grupa("Grupa 1" , "OOAD"))
             grupe.add(Grupa("Grupa 2" , "OOAD"))
-            grupe.add(Grupa("Grupa 1" , "OE"))
+            grupe.add(Grupa("Grupa 3" , "OE"))
             grupe.add(Grupa("Grupa 2" , "OE"))
             grupe.add(Grupa("DM grupa 1", "DM"))
             grupe.add(Grupa("OBP grupa 1", "OBP"))
@@ -31,7 +28,7 @@ class GrupaRepository {
             return rez
         }
         fun dajNeupisaneGrupe(): List<Grupa> {
-            return grupe.filter { grupa -> !grupe.contains(grupa) }
+            return grupe.filter { grupa -> !upisanegrupe.contains(grupa) }
         }
     }
 }
