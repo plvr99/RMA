@@ -13,7 +13,7 @@ class GrupaRepository {
             grupe.add(Grupa("Grupa 2" , "ASP"))
             grupe.add(Grupa("Grupa 1" , "OOAD"))
             grupe.add(Grupa("Grupa 2" , "OOAD"))
-            grupe.add(Grupa("Grupa 3" , "OE"))
+            grupe.add(Grupa("Grupa 1" , "OE"))
             grupe.add(Grupa("Grupa 2" , "OE"))
             grupe.add(Grupa("DM grupa 1", "DM"))
             grupe.add(Grupa("OBP grupa 1", "OBP"))
