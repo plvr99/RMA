@@ -23,12 +23,12 @@ class KvizViewModel() {
         return KvizRepository.getAll()
     }
 
-    fun getDone(): List<Kviz> {
-        return KvizRepository.getDone()
+    fun getMyDone(): List<Kviz> {
+        return KvizRepository.getMyDone()
     }
 
-    fun getFuture(): List<Kviz> {
-        return KvizRepository.getFuture()
+    fun getMyFuture(): List<Kviz> {
+        return KvizRepository.getMyFuture()
     }
     fun dajNeupisanePredmete(): List<Predmet> {
         return PredmetRepository.dajNeupisanePredmete()
@@ -48,8 +48,8 @@ class KvizViewModel() {
     fun dajNeupisaneGrupe(): List<Grupa> {
         return GrupaRepository.grupe.filter { grupa -> !GrupaRepository.upisanegrupe.contains(grupa) }
     }
-    fun getNotTaken(): List<Kviz> {
-        return KvizRepository.getNotTaken()
+    fun getMyNotTaken(): List<Kviz> {
+        return KvizRepository.getMyNotTaken()
     }
     fun dajSveGrupeZaPredmet(predmet: String) : List<Grupa>{
         return GrupaRepository.getGroupsByPredmet(predmet)

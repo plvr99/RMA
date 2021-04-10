@@ -1,6 +1,5 @@
 package ba.etf.rma21.projekat.viewmodel
 
-import ba.etf.rma21.projekat.data.repositories.PredmetRepository
 import junit.framework.TestCase
 import org.junit.Test
 
@@ -21,12 +20,12 @@ class KvizViewModelTest : TestCase() {
     }
     @Test
     fun testGetDone() {
-        assertFalse(kvizViewModel.getDone().isEmpty())
+        assertFalse(kvizViewModel.getMyDone().isEmpty())
     }
     @Test
     fun testGetFuture() {
-        assertEquals(2,kvizViewModel.getFuture().size)
-        assert(kvizViewModel.getFuture().all { kviz -> kviz.osvojeniBodovi==null })
+        assertEquals(1,kvizViewModel.getMyFuture().size)
+        assert(kvizViewModel.getMyFuture().all { kviz -> kviz.osvojeniBodovi==null })
     }
     @Test
     fun testDajNeupisanePredmete() {
@@ -44,7 +43,7 @@ class KvizViewModelTest : TestCase() {
     }
     @Test
     fun testGetNotTaken() {
-        assert(!kvizViewModel.getNotTaken().isEmpty())
+        assert(!kvizViewModel.getMyNotTaken().isEmpty())
     }
     @Test
     fun testDajSveGrupeZaPredmet() {

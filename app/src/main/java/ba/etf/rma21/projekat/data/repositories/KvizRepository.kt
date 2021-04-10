@@ -38,16 +38,26 @@ class KvizRepository {
         fun getAll(): List<Kviz> {
             return kvizovi
         }
-
         fun getDone(): List<Kviz> {
-            return mojiKvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz)==1 }
+            return kvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz)==1 }
         }
 
         fun getFuture(): List<Kviz> {
-            return mojiKvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz) == 3 }
+            return kvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz) == 3 }
         }
 
         fun getNotTaken(): List<Kviz> {
+            return kvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz)== 4 }
+        }
+        fun getMyDone(): List<Kviz> {
+            return mojiKvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz)==1 }
+        }
+
+        fun getMyFuture(): List<Kviz> {
+            return mojiKvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz) == 3 }
+        }
+
+        fun getMyNotTaken(): List<Kviz> {
             return mojiKvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz)== 4 }
         }
         fun createDate(year : Int, month: Int, day : Int) : Date{
