@@ -20,12 +20,12 @@ class KvizViewModelTest : TestCase() {
     }
     @Test
     fun testGetDone() {
-        assertFalse(kvizViewModel.getMyDone().isEmpty())
+        assertFalse(kvizViewModel.getDone().isEmpty())
     }
     @Test
     fun testGetFuture() {
-        assertEquals(1,kvizViewModel.getMyFuture().size)
-        assert(kvizViewModel.getMyFuture().all { kviz -> kviz.osvojeniBodovi==null })
+        assertEquals(1,kvizViewModel.getFuture().size)
+        assert(kvizViewModel.getFuture().all { kviz -> kviz.osvojeniBodovi==null })
     }
     @Test
     fun testDajNeupisanePredmete() {
@@ -43,7 +43,7 @@ class KvizViewModelTest : TestCase() {
     }
     @Test
     fun testGetNotTaken() {
-        assert(!kvizViewModel.getMyNotTaken().isEmpty())
+        assert(!kvizViewModel.getNotTaken().isEmpty())
     }
     @Test
     fun testDajSveGrupeZaPredmet() {

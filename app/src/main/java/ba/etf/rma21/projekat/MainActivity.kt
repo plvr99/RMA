@@ -60,9 +60,9 @@ class MainActivity : AppCompatActivity(){
         when(position){
             0 ->{kvizAdapter.updateList(kvizViewModel.getMyKvizes().sortedBy { kviz -> kviz.datumPocetka })}
             1 ->{kvizAdapter.updateList(kvizViewModel.getAll().sortedBy { kviz -> kviz.datumPocetka })}
-            2 ->{kvizAdapter.updateList(kvizViewModel.getMyDone().sortedBy { kviz -> kviz.datumPocetka })}
-            3 ->{kvizAdapter.updateList(kvizViewModel.getMyFuture().sortedBy { kviz -> kviz.datumPocetka })}
-            4 ->{kvizAdapter.updateList(kvizViewModel.getMyNotTaken().sortedBy { kviz -> kviz.datumPocetka })}
+            2 ->{kvizAdapter.updateList(kvizViewModel.getDone().sortedBy { kviz -> kviz.datumPocetka })}
+            3 ->{kvizAdapter.updateList(kvizViewModel.getFuture().sortedBy { kviz -> kviz.datumPocetka })}
+            4 ->{kvizAdapter.updateList(kvizViewModel.getNotTaken().sortedBy { kviz -> kviz.datumPocetka })}
         }
     }
 
