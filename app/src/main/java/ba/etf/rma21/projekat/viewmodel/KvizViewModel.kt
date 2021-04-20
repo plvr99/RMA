@@ -10,6 +10,9 @@ import ba.etf.rma21.projekat.data.repositories.PredmetRepository
 class KvizViewModel() {
     companion object {
         var odabranaGodina: Int = 1
+        var odabraniPredmet: Int = 0
+        var odabranaGrupa: Int = 0
+        var odabraniKvizovi: Int = 0
     }
 
     fun getAllPredmets() : List<Predmet>{

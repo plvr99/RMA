@@ -13,7 +13,7 @@ import java.text.DateFormat
 import java.text.SimpleDateFormat
 import java.util.*
 
-class KvizAdapter(private var kvizovi : List<Kviz>) : RecyclerView.Adapter<KvizAdapter.KvizViewHolder>() {
+class KvizAdapter(private var kvizovi : List<Kviz>, private val onItemClicked: (kviz:Kviz)->Unit) : RecyclerView.Adapter<KvizAdapter.KvizViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): KvizViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.kviz_item2,parent,false)
@@ -28,6 +28,7 @@ class KvizAdapter(private var kvizovi : List<Kviz>) : RecyclerView.Adapter<KvizA
         odrediTipKviza(kvizovi[position]).also {
             postaviSlikuIDatum(it, holder, kvizovi[position])
         }
+        holder.itemView.setOnClickListener{onItemClicked(kvizovi[position])}
     }
     fun updateList(newList : List<Kviz>){
         kvizovi = newList
@@ -76,5 +77,6 @@ class KvizAdapter(private var kvizovi : List<Kviz>) : RecyclerView.Adapter<KvizA
         if(tip==1) holder.kvizBodovi.text = kviz.osvojeniBodovi.toString() else holder.kvizBodovi.text = " "
         holder.kvizDatum.text = dateFormat
     }
+
 
 }

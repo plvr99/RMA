@@ -1,70 +1,100 @@
 package ba.etf.rma21.projekat
 
-import android.content.Intent
 import android.os.Bundle
-import android.view.View
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
-import ba.etf.rma21.projekat.view.KvizAdapter
-import ba.etf.rma21.projekat.viewmodel.KvizViewModel
+import androidx.core.view.get
+import androidx.fragment.app.Fragment
+import ba.etf.rma21.projekat.view.FragmentKvizovi
+import ba.etf.rma21.projekat.view.FragmentPoruka
+import ba.etf.rma21.projekat.view.FragmentPredmeti
+import com.google.android.material.bottomnavigation.BottomNavigationView
+
 
 
 class MainActivity : AppCompatActivity(){
-    private lateinit var kvizoviRecyclerView: RecyclerView
-    private lateinit var kvizAdapter: KvizAdapter
-    private lateinit var spinner: Spinner
-    private var kvizViewModel : KvizViewModel = KvizViewModel()
+    private lateinit var bottomNavigation: BottomNavigationView
+
+    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+        when (item.itemId) {
+            R.id.navigation_kvizovi -> {
+                println("FRAG_KVIZOVI")
+                println(bottomNavigation.menu.size())
+                val kvizFragment = FragmentKvizovi.newInstance()
+                hideMenuItems(arrayListOf(2,3))
+                openFragment(kvizFragment, "FRAG_KVIZOVI")
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_predmeti -> {
+                println("FRAG_PREDMETI")
+                println(bottomNavigation.menu.size())
+                val predmetFragment = FragmentPredmeti.newInstance()
+                hideMenuItems(arrayListOf(2,3))
+                openFragment(predmetFragment, "FRAG_PREDMETI")
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.predajKviz ->{
+                //todo popravit
+                println(bottomNavigation.menu.size())
+            }
+            R.id.zaustaviKviz ->{
+                //todo popravit
+                println("FRAG_KVIZOVI")
+                println(bottomNavigation.menu.size())
+                val kvizFragment = FragmentKvizovi.newInstance()
+                hideMenuItems(arrayListOf(2,3))
+                openFragment(kvizFragment, "FRAG_KVIZOVI")
+                return@OnNavigationItemSelectedListener true
+            }
+        }
+        false
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        kvizoviRecyclerView = findViewById(R.id.listaKvizova)
-        kvizoviRecyclerView.layoutManager = GridLayoutManager(this,2,RecyclerView.VERTICAL,false)
+        bottomNavigation = findViewById(R.id.bottomNav)
+        bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
+        bottomNavigation.selectedItemId = R.id.navigation_kvizovi
+        val kvizFragment = FragmentKvizovi.newInstance()
+        if(savedInstanceState == null) openFragment(kvizFragment, "FRAG_KVIZOVI")
+            //TODO ROTATE FIX
 
-        kvizAdapter = KvizAdapter(kvizViewModel.getAll())
-        kvizoviRecyclerView.adapter = kvizAdapter
+    }
 
-        spinner = findViewById(R.id.filterKvizova)
-        ArrayAdapter.createFromResource(this, R.array.spinner_choice_array, android.R.layout.simple_spinner_item).also { adapter ->
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            spinner.adapter = adapter
-        }
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                prikaziKvizoveSaOpcijom(position)
-        }
-            override fun onNothingSelected(parent: AdapterView<*>?) {
+    private fun openFragment(fragment: Fragment, tag: String) {
+        val transaction = supportFragmentManager.beginTransaction()
+        //todo wtf container
+        transaction.replace(R.id.container, fragment)
+        transaction.addToBackStack(null)
+
+        transaction.commit()
+    }
+
+    override fun onBackPressed() {
+        when {
+            getVisibleFragment() is FragmentKvizovi -> {
+                return
+            }
+            getVisibleFragment() is FragmentPredmeti -> {
+                super.onBackPressed()
+                bottomNavigation.selectedItemId = R.id.navigation_kvizovi
+            }
+            getVisibleFragment() is FragmentPoruka -> {
+                openFragment(FragmentKvizovi.newInstance(), "FRAG_KVIZOVI")
+                bottomNavigation.selectedItemId = R.id.navigation_kvizovi
             }
         }
-        val floatingActionButton : View = findViewById(R.id.upisDugme)
-        floatingActionButton.setOnClickListener{dodajPredmet()}
     }
-
-    override fun onRestart() {
-        prikaziKvizoveSaOpcijom(spinner.selectedItemPosition)
-        super.onRestart()
-    }
-
-    private fun dodajPredmet() {
-        val intent = Intent(this, UpisPredmet::class.java).apply {
-           // putExtra("model", kvizViewModel)
+    private fun getVisibleFragment(): Fragment? {
+        val fragmentManager = this@MainActivity.supportFragmentManager
+        for (fragment in fragmentManager.fragments) {
+            if (fragment != null && fragment.isVisible) return fragment
         }
-        startActivity(intent)
+        return null
     }
-
-    fun prikaziKvizoveSaOpcijom(position: Int){
-        when(position){
-            0 ->{kvizAdapter.updateList(kvizViewModel.getMyKvizes().sortedBy { kviz -> kviz.datumPocetka })}
-            1 ->{kvizAdapter.updateList(kvizViewModel.getAll().sortedBy { kviz -> kviz.datumPocetka })}
-            2 ->{kvizAdapter.updateList(kvizViewModel.getDone().sortedBy { kviz -> kviz.datumPocetka })}
-            3 ->{kvizAdapter.updateList(kvizViewModel.getFuture().sortedBy { kviz -> kviz.datumPocetka })}
-            4 ->{kvizAdapter.updateList(kvizViewModel.getNotTaken().sortedBy { kviz -> kviz.datumPocetka })}
-        }
+    fun hideMenuItems(id : List<Int>){
+        for (i in 0 until bottomNavigation.menu.size()) bottomNavigation.menu.get(i).isVisible= true
+        for (i in id) bottomNavigation.menu.get(i).isVisible= false
     }
-
 }
 

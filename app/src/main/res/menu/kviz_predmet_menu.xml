@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation_kvizovi"
+        android:icon="@android:drawable/ic_dialog_dialer"
+        android:title="Kvizovi" />
+    <item
+        android:id="@+id/navigation_predmeti"
+        android:icon="@android:drawable/ic_menu_add"
+        android:title="Predmeti" />
+    <item
+        android:id="@+id/predajKviz"
+        android:icon="@android:drawable/checkbox_on_background"
+        android:title="Predaj Kviz" />
+    <item
+        android:id="@+id/zaustaviKviz"
+        android:icon="@android:drawable/presence_offline"
+        android:title="Zaustavi Kviz" />
+</menu>

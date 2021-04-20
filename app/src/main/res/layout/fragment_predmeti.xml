@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".UpisPredmet">
+    tools:context=".MainActivity">
 
     <TextView
         android:id="@+id/textView"
@@ -70,13 +70,13 @@
 
     <Button
         android:id="@+id/dodajPredmetDugme"
-        android:layout_width="190dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.949"
+        app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/odabirGrupa"
-        app:layout_constraintVertical_bias="0.936" />
+        app:layout_constraintVertical_bias="0.174" />
 </androidx.constraintlayout.widget.ConstraintLayout>
