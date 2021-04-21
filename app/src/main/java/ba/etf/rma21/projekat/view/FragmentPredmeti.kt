@@ -7,7 +7,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import ba.etf.rma21.projekat.MainActivity
 import ba.etf.rma21.projekat.R
 import ba.etf.rma21.projekat.viewmodel.KvizViewModel
 
@@ -16,14 +15,6 @@ class FragmentPredmeti : Fragment() {
     var kvizModel : KvizViewModel = KvizViewModel()
     lateinit var spinnerGodina : Spinner
     lateinit var button : Button
-
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        arguments?.let {
-//            param1 = it.getString(ARG_PARAM1)
-//            param2 = it.getString(ARG_PARAM2)
-//        }
-//    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -67,7 +58,7 @@ class FragmentPredmeti : Fragment() {
 
         spinnerGodina.setSelection(KvizViewModel.odabranaGodina - 1)
         spinnerPredmet.setSelection(KvizViewModel.odabraniPredmet)
-        spinnerGrupa.setSelection(KvizViewModel.odabraniPredmet)
+        spinnerGrupa.setSelection(KvizViewModel.odabranaGrupa)
         spinnerGodina.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -168,13 +159,16 @@ class FragmentPredmeti : Fragment() {
     }
 
     fun obavijestiKorisnika(grupa: String, predmet: String) {
-        val nextFrag = FragmentPoruka.newInstance(grupa, predmet)
+        val string : String = "Uspješno ste upisani u grupu $grupa predmeta $predmet!"
+        val nextFrag = FragmentPoruka.newInstance(string)
 
         activity!!.supportFragmentManager.beginTransaction()
             .remove(this@FragmentPredmeti)
-            .replace((view!!.parent as ViewGroup).id, nextFrag, "findThisFragment")
-            //.addToBackStack(null)
+            .replace(R.id.container, nextFrag, "findThisFragment")
+            .addToBackStack(null)
             .commit()
+        println("frag size" + activity!!.supportFragmentManager.fragments.size)
+        println("backstack size" + activity!!.supportFragmentManager.backStackEntryCount)
 
     }
 

@@ -10,15 +10,12 @@ import ba.etf.rma21.projekat.R
 
 
 class FragmentPoruka : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var grupa: String? = null
-    private var predmet: String? = null
+    private var message: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            grupa = it.getString("grupa")
-            predmet = it.getString("predmet")
+            message = it.getString("string")
         }
     }
 
@@ -27,18 +24,17 @@ class FragmentPoruka : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        var view =  inflater.inflate(R.layout.fragment_poruka, container, false)
+        val view =  inflater.inflate(R.layout.fragment_poruka, container, false)
         val textView : TextView= view.findViewById(R.id.tvPoruka)
-        textView.text = "Uspješno ste upisani u grupu $grupa predmeta $predmet!"
+        textView.text = message
         return view
     }
 
     companion object {
-        fun newInstance(grupa: String, predmet: String) : FragmentPoruka{
+        fun newInstance(string: String) : FragmentPoruka{
             val fragment = FragmentPoruka();
             val args = Bundle()
-            args.putString("grupa", grupa)
-            args.putString("predmet", predmet)
+            args.putString("string", string)
             fragment.arguments=args
             return fragment
         }

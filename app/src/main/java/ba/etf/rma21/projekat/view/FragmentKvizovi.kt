@@ -24,14 +24,6 @@ class FragmentKvizovi : Fragment() {
     //new
     private var pitanjeKvizViewModel : PitanjeKvizViewModel = PitanjeKvizViewModel()
 
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        arguments?.let {
-//            param1 = it.getString(ARG_PARAM1)
-//            param2 = it.getString(ARG_PARAM2)
-//        }
-//    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_kvizovi, container, false)
@@ -58,7 +50,6 @@ class FragmentKvizovi : Fragment() {
         }
         return view
     }
-    //todo izbrisati ukoliko nije potrebno
     override fun onResume() {
         prikaziKvizoveSaOpcijom(spinner.selectedItemPosition)
         super.onResume()
@@ -78,14 +69,11 @@ class FragmentKvizovi : Fragment() {
     }
 
     private fun otvoriKviz(kviz : Kviz){
-        //todo treba poslati nesto u new instance
-        println("OTVARAAAAAJ")
-
-        val nextFrag = FragmentPokusaj.newInstance(pitanjeKvizViewModel.getPitanja(kviz.naziv, kviz.nazivPredmeta))
+        val nextFrag = FragmentPokusaj.newInstance(pitanjeKvizViewModel.getPitanja(kviz.naziv, kviz.nazivPredmeta),
+            kviz.naziv, kviz.nazivPredmeta, kviz.nazivGrupe)
 
         activity!!.supportFragmentManager.beginTransaction()
-            //.remove(this@FragmentKvizovi)
-            .replace((view!!.parent as ViewGroup).id, nextFrag, "FRAG_POKUSAJ")
+            .replace(R.id.container, nextFrag, "FRAG_POKUSAJ")
             .addToBackStack(null)
             .commit()
         val activity = activity as MainActivity
