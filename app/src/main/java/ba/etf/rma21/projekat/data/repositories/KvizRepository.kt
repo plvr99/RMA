@@ -15,7 +15,7 @@ class KvizRepository {
                     Kviz("Kviz 1","ASP",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 2, "Grupa 1",2f),
                     Kviz("Kviz 2","ASP",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 5, "Grupa 2",null),
                     Kviz("Kviz 1","OE", createDate(2021, 9,10), createDate(2021, 9,10), createDate(2021, 9,10) ,4, "Grupa 1",null),
-                    Kviz("Kviz 2","OE", Calendar.getInstance().time, createDate(2021,5,22), createDate(2021,5,22) ,4, "Grupa 2",null),
+                    Kviz("Kviz 2","OE", Calendar.getInstance().time, createDate(2021,7,22), createDate(2021,7,22) ,4, "Grupa 2",null),
                     Kviz("Kviz 1","OOAD",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 2, "Grupa 1",0f),
                     Kviz("Kviz 2","OOAD",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 2, "Grupa 2",0.8f),
                     Kviz("Kviz 1","DM", createDate(2021, 5,15),createDate(2021, 5,15), createDate(2021, 5,15), 5,"DM grupa 1", null),
