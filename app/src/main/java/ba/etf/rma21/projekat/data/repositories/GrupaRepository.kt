@@ -20,7 +20,7 @@ class GrupaRepository {
             grupe.add(Grupa("RMA grupa 1",  "RMA"))
             grupe.add(Grupa("IEK grupa 1", "IEK"))
 
-            upisanegrupe = arrayListOf(grupe.get(8), grupe.get(9), grupe.get(10),grupe.get(11))
+            upisanegrupe = arrayListOf(grupe.get(0), grupe.get(8), grupe.get(9), grupe.get(10),grupe.get(11))
         }
 
         fun getGroupsByPredmet(nazivPredmeta: String): List<Grupa> {

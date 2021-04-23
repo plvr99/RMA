@@ -11,7 +11,6 @@ import ba.etf.rma21.projekat.R
 import ba.etf.rma21.projekat.data.models.Kviz
 import java.text.DateFormat
 import java.text.SimpleDateFormat
-import java.util.*
 
 class KvizAdapter(private var kvizovi : List<Kviz>, private val onItemClicked: (kviz:Kviz)->Unit) : RecyclerView.Adapter<KvizAdapter.KvizViewHolder>() {
 
@@ -25,7 +24,7 @@ class KvizAdapter(private var kvizovi : List<Kviz>, private val onItemClicked: (
         holder.kvizNaziv.text = kvizovi[position].naziv
         holder.kvizBodovi.text = kvizovi[position].osvojeniBodovi.toString()
         holder.kvizTrajanje.text = kvizovi[position].trajanje.toString() + " min"
-        odrediTipKviza(kvizovi[position]).also {
+        kvizovi[position].odrediTipKviza().also {
             postaviSlikuIDatum(it, holder, kvizovi[position])
         }
         holder.itemView.setOnClickListener{onItemClicked(kvizovi[position])}
@@ -46,20 +45,6 @@ class KvizAdapter(private var kvizovi : List<Kviz>, private val onItemClicked: (
         var kvizBodovi : TextView = itemView.findViewById(R.id.textViewBodovi)
     }
 
-    private fun odrediTipKviza(kviz: Kviz) : Int{
-        //Calendar.getInstance().time KAO CURRENT TIME
-        //ima bodove i datum kraj je prije now - plava, kviz koji je urađen,
-        if(kviz.osvojeniBodovi != null) return 1
-        else{
-            //nema bodove i now je prije pocetka - zuta kviz koji tek treba biti aktivan,
-            if(Calendar.getInstance().time.before(kviz.datumPocetka)) return 3
-            // nema bodove i now je poslije datum kraj - crvena  kviz koji je prošao, a nije urađen.
-            if(Calendar.getInstance().time.after(kviz.datumKraj)) return 4
-            //nema bodove i datum rada + minute je prije datum kraja - zelena kviz koji je aktivan, ali nije urađen,
-            if(kviz.datumPocetka.before(Calendar.getInstance().time) && kviz.datumKraj.after(Calendar.getInstance().time)) return 2
-        }
-        return 0
-    }
     private fun postaviSlikuIDatum(tip : Int , holder: KvizViewHolder, kviz : Kviz){
         val context: Context = holder.image.context
         val sd = SimpleDateFormat("dd.MM.yyyy")

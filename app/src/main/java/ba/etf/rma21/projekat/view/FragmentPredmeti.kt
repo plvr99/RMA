@@ -1,6 +1,7 @@
 package ba.etf.rma21.projekat.view
 
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,21 +10,26 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import ba.etf.rma21.projekat.R
 import ba.etf.rma21.projekat.viewmodel.KvizViewModel
+import java.util.*
 
 
 class FragmentPredmeti : Fragment() {
     var kvizModel : KvizViewModel = KvizViewModel()
     lateinit var spinnerGodina : Spinner
+    lateinit var spinnerPredmet : Spinner
+    lateinit var spinnerGrupa : Spinner
     lateinit var button : Button
+    lateinit var adapterPredmet : ArrayAdapter<String>
+    lateinit var adapterGrupa : ArrayAdapter<String>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        var view = inflater.inflate(R.layout.fragment_predmeti, container, false)
-        val spinnerPredmet : Spinner = view.findViewById(R.id.odabirPredmet)
-        val spinnerGrupa : Spinner = view.findViewById(R.id.odabirGrupa)
+        val view = inflater.inflate(R.layout.fragment_predmeti, container, false)
+        spinnerPredmet = view.findViewById(R.id.odabirPredmet)
+        spinnerGrupa  = view.findViewById(R.id.odabirGrupa)
         spinnerGodina = view.findViewById(R.id.odabirGodina)
         button = view.findViewById(R.id.dodajPredmetDugme)
         var predmetChoiceList : List<String> = arrayListOf()
@@ -38,17 +44,13 @@ class FragmentPredmeti : Fragment() {
             spinnerGodina.adapter = adapter
         }
 
-        val adapterPredmet: ArrayAdapter<String> = ArrayAdapter(
-            context!!,
-            android.R.layout.simple_spinner_item,
-            predmetChoiceList
+        adapterPredmet = ArrayAdapter(
+            context!!, android.R.layout.simple_spinner_item, predmetChoiceList
         ).also {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
-        val adapterGrupa: ArrayAdapter<String> = ArrayAdapter(
-            context!!,
-            android.R.layout.simple_spinner_item,
-            groupChoiceList
+        adapterGrupa = ArrayAdapter(
+            context!!, android.R.layout.simple_spinner_item, groupChoiceList
         ).also {
             it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         }
@@ -56,29 +58,28 @@ class FragmentPredmeti : Fragment() {
         spinnerPredmet.adapter = adapterPredmet
         spinnerGrupa.adapter = adapterGrupa
 
-        spinnerGodina.setSelection(KvizViewModel.odabranaGodina - 1)
-        spinnerPredmet.setSelection(KvizViewModel.odabraniPredmet)
-        spinnerGrupa.setSelection(KvizViewModel.odabranaGrupa)
         spinnerGodina.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
+                parent: AdapterView<*>?, view: View?, position: Int, id: Long
             ) {
+               // println("spinner godina pozvan")
                 predmetChoiceList = kvizModel.dajNeupisanePredmete().filter { predmet -> predmet.godina.equals(
                     position + 1
                 )}.map { predmet -> predmet.toString() }
                 adapterPredmet.clear()
                 if(predmetChoiceList.isEmpty()) {
-                    adapterPredmet.clear()
                     button.isVisible = false
                 }
-                else adapterPredmet.addAll(predmetChoiceList)
+                adapterPredmet.addAll(predmetChoiceList)
                 adapterPredmet.notifyDataSetChanged()
-                if(!spinnerPredmet.adapter.isEmpty)
-                    spinnerPredmet.onItemSelectedListener!!.onItemSelected(parent, view, 0, id)
-                KvizViewModel.odabranaGodina = spinnerGodina.selectedItem.toString().toInt()
+                if(predmetChoiceList.isEmpty())
+                    (spinnerGrupa.adapter as ArrayAdapter<*>).clear()
+                if(predmetChoiceList.isNotEmpty()) spinnerGrupa.onItemSelectedListener!!.onItemSelected(
+                    parent,
+                    view,
+                    0,
+                    id
+                )
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
@@ -86,11 +87,9 @@ class FragmentPredmeti : Fragment() {
 
         spinnerPredmet.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(
-                parent: AdapterView<*>?,
-                view: View?,
-                position: Int,
-                id: Long
+                parent: AdapterView<*>?, view: View?, position: Int, id: Long
             ) {
+                //println("spinner predmet pozvan")
                 val predmet : String = spinnerPredmet.getItemAtPosition(position).toString()
                 groupChoiceList = kvizModel.dajSveGrupeZaPredmet(predmet).map { grupa -> grupa.toString() }
                 adapterGrupa.clear()
@@ -98,12 +97,9 @@ class FragmentPredmeti : Fragment() {
                     adapterGrupa.clear()
                     button.isVisible = false
                 }
-                else adapterGrupa.addAll(groupChoiceList)
+                adapterGrupa.addAll(groupChoiceList)
                 adapterGrupa.notifyDataSetChanged()
-                if(spinnerPredmet.selectedItem == null) spinnerPredmet.setSelection(0)
-                //RAKESH
-                spinnerGrupa.onItemSelectedListener!!.onItemSelected(parent, view, 0, id)
-                KvizViewModel.odabraniPredmet = spinnerPredmet.selectedItemPosition
+                spinnerGrupa.setSelection(0, false)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
@@ -112,22 +108,6 @@ class FragmentPredmeti : Fragment() {
                 adapterGrupa.notifyDataSetChanged()
             }
         }
-
-        spinnerGodina.performItemClick(
-            spinnerGodina.getChildAt(KvizViewModel.odabranaGodina),
-            KvizViewModel.odabranaGodina,
-            spinnerGodina.adapter.getItemId(KvizViewModel.odabranaGodina)
-        )
-        button.setOnClickListener {
-            upisiNaPredmet(
-                spinnerGodina.selectedItemPosition,
-                spinnerPredmet.selectedItem.toString(),
-                spinnerGrupa.selectedItem.toString()
-            )
-            KvizViewModel.odabranaGodina = spinnerGodina.selectedItem.toString().toInt()
-            obavijestiKorisnika(spinnerGrupa.selectedItem.toString(), spinnerPredmet.selectedItem.toString())
-        }
-
         spinnerGrupa.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(
                 parent: AdapterView<*>?,
@@ -135,13 +115,27 @@ class FragmentPredmeti : Fragment() {
                 position: Int,
                 id: Long
             ) {
+                //println("spinner grupa pozvan")
                 button.isVisible=true
-                KvizViewModel.odabranaGrupa = spinnerGrupa.selectedItemPosition
             }
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 button.isVisible=false
             }
         }
+        button.setOnClickListener {
+            upisiNaPredmet(
+                spinnerGodina.selectedItemPosition,
+                spinnerPredmet.selectedItem.toString(),
+                spinnerGrupa.selectedItem.toString()
+            )
+            obavijestiKorisnika(
+                spinnerGrupa.selectedItem.toString(),
+                spinnerPredmet.selectedItem.toString()
+            )
+        }
+
+        spinnerGodina.setSelection(KvizViewModel.odabranaGodina, false)
+        loadSpinners()
         return view
     }
 
@@ -151,15 +145,10 @@ class FragmentPredmeti : Fragment() {
     private fun upisiNaPredmet(godina: Int, predmet: String, grupa: String) {
         val godinaPredmeta = godina + 1
         kvizModel.upisiNaPredmet(godinaPredmeta, predmet, grupa)
-       // Toast.makeText(context!!, "Upisan", Toast.LENGTH_SHORT).show()
-        KvizViewModel.odabranaGodina = 1
-        KvizViewModel.odabraniPredmet = 0
-        KvizViewModel.odabranaGrupa = 0
-
     }
 
-    fun obavijestiKorisnika(grupa: String, predmet: String) {
-        val string : String = "Uspješno ste upisani u grupu $grupa predmeta $predmet!"
+    private fun obavijestiKorisnika(grupa: String, predmet: String) {
+        val string  = "Uspješno ste upisani u grupu $grupa predmeta $predmet!"
         val nextFrag = FragmentPoruka.newInstance(string)
 
         activity!!.supportFragmentManager.beginTransaction()
@@ -167,9 +156,41 @@ class FragmentPredmeti : Fragment() {
             .replace(R.id.container, nextFrag, "findThisFragment")
             .addToBackStack(null)
             .commit()
-        println("frag size" + activity!!.supportFragmentManager.fragments.size)
-        println("backstack size" + activity!!.supportFragmentManager.backStackEntryCount)
+    }
+    private fun loadSpinners(){
+        if(KvizViewModel.odabraniPredmet==-1){
+            adapterPredmet.clear()
+            adapterGrupa.clear()
+            return
+        }
+        val predmeti = kvizModel.dajNeupisanePredmete().filter { predmet -> predmet.godina.equals(
+            KvizViewModel.odabranaGodina + 1
+        )}.map { predmet -> predmet.toString() }
+
+        val predmet = predmeti[KvizViewModel.odabraniPredmet]
+        val grupe = kvizModel.dajSveGrupeZaPredmet(predmet).map { grupa -> grupa.toString() }
+
+        adapterPredmet.clear()
+        adapterPredmet.addAll(predmeti)
+
+        spinnerPredmet.setSelection(KvizViewModel.odabraniPredmet)
+        if(KvizViewModel.odabranaGrupa == -1) {
+            adapterGrupa.clear()
+            return
+        }
+        adapterGrupa.clear()
+        adapterGrupa.addAll(grupe)
+        spinnerGrupa.setSelection(KvizViewModel.odabranaGrupa)
+        Handler().postDelayed({
+            spinnerGrupa.setSelection(KvizViewModel.odabranaGrupa)
+        }, 50)
 
     }
 
+    override fun onPause() {
+        KvizViewModel.odabranaGodina = spinnerGodina.selectedItemPosition
+        KvizViewModel.odabraniPredmet = spinnerPredmet.selectedItemPosition
+        KvizViewModel.odabranaGrupa = spinnerGrupa.selectedItemPosition
+        super.onPause()
+    }
 }

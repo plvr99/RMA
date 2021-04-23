@@ -13,7 +13,8 @@ class PitanjeKvizRepository {
                 Pitanje("P2","3+3=", arrayListOf("4","6","8"), 1)
             )
             lista = arrayListOf(
-                PitanjeKviz("P1","Kviz 2", "IM1"), PitanjeKviz("P2","Kviz 2", "IM1")
+                PitanjeKviz("P1","Kviz 2", "IM1"), PitanjeKviz("P2","Kviz 2", "IM1"),
+                PitanjeKviz("P1","Kviz 1", "IM1"), PitanjeKviz("P2","Kviz 1", "IM1")
             )
         }
         fun getPitanja(nazivKviza: String, nazivPredmeta: String): List<Pitanje> {

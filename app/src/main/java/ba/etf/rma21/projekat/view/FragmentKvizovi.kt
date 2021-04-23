@@ -1,13 +1,14 @@
 package ba.etf.rma21.projekat.view
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
+import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import ba.etf.rma21.projekat.MainActivity
@@ -69,15 +70,23 @@ class FragmentKvizovi : Fragment() {
     }
 
     private fun otvoriKviz(kviz : Kviz){
-        val nextFrag = FragmentPokusaj.newInstance(pitanjeKvizViewModel.getPitanja(kviz.naziv, kviz.nazivPredmeta),
-            kviz.naziv, kviz.nazivPredmeta, kviz.nazivGrupe)
-
-        activity!!.supportFragmentManager.beginTransaction()
-            .replace(R.id.container, nextFrag, "FRAG_POKUSAJ")
-            .addToBackStack(null)
-            .commit()
-        val activity = activity as MainActivity
-        activity.hideMenuItems(arrayListOf(0,1))
+        val pitanja = pitanjeKvizViewModel.getPitanja(kviz.naziv, kviz.nazivPredmeta)
+        when {
+            kviz.odrediTipKviza() != 2 -> Toast.makeText(context, "Ne mozete pristupiti ovom kvizu", Toast.LENGTH_SHORT).show()
+            pitanja.isEmpty() -> Toast.makeText(context, "Nema pitanja za ovaj kviz", Toast.LENGTH_SHORT).show()
+            else -> {
+                val nextFrag = FragmentPokusaj.newInstance(
+                    pitanja,
+                    kviz.naziv, kviz.nazivPredmeta, kviz.nazivGrupe
+                )
+                activity!!.supportFragmentManager.beginTransaction()
+                    .replace(R.id.container, nextFrag, "FRAG_POKUSAJ")
+                    .addToBackStack(null)
+                    .commit()
+                val activity = activity as MainActivity
+                activity.hideMenuItems(arrayListOf(0, 1))
+            }
+        }
     }
 
 }

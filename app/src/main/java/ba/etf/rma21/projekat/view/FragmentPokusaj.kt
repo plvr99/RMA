@@ -5,22 +5,20 @@ import android.os.Bundle
 import android.os.Parcelable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.core.view.get
+import androidx.fragment.app.Fragment
 import ba.etf.rma21.projekat.MainActivity
 import ba.etf.rma21.projekat.R
 import ba.etf.rma21.projekat.data.models.Odgovor
 import ba.etf.rma21.projekat.data.models.Pitanje
-import ba.etf.rma21.projekat.data.repositories.OdgovoriRepository
 import ba.etf.rma21.projekat.viewmodel.PitanjeKvizViewModel
 import com.google.android.material.navigation.NavigationView
 import java.util.*
-import kotlin.collections.ArrayList
 
 class FragmentPokusaj : Fragment() {
     private lateinit var navigacijaPitanja : NavigationView
@@ -36,7 +34,7 @@ class FragmentPokusaj : Fragment() {
     private val mOnNavigationItemSelectedListener = NavigationView.OnNavigationItemSelectedListener {
         item ->
         if(item.title.equals("Rezultat")){
-            val poruka = "Završili ste kviz ${nazivKviza} sa tačnosti ${procenatTacnosti()}"
+            val poruka = "Završili ste kviz ${nazivKviza} sa tačnosti ${odgovor.procenatTacnosti * 100} %"
             val frag = FragmentPoruka.newInstance(poruka)
             activity!!.supportFragmentManager.beginTransaction().replace(R.id.container, frag, "poruka").commit()
         }
@@ -70,12 +68,12 @@ class FragmentPokusaj : Fragment() {
         val view = inflater.inflate(R.layout.fragment_pokusaj, container, false)
         pitanjeFrame = view.findViewById(R.id.framePitanje)
         navigacijaPitanja = view.findViewById(R.id.navigacijaPitanja)
-        for (i in 1 .. pitanja.size) navigacijaPitanja.menu.add(R.id.nav_pitanja, i, i, i.toString())
+        for (i in pitanja.indices) navigacijaPitanja.menu.add(R.id.nav_pitanja, i, i, (i+1).toString())
         navigacijaPitanja.menu.add(R.id.rezultat, pitanja.size, pitanja.size, "Rezultat")
         navigacijaPitanja.setNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         navigacijaPitanja.menu.get(pitanja.size).isVisible = false
         //oboji redne br pitanjaa
-        for ( i in 0 until pitanja.size)
+        for ( i in pitanja.indices)
             colorPitanje(odgovor.pitanja.get(i).tacnoOdgovoreno, i)
 
         if(odgovor.zavrseno) {
@@ -99,7 +97,7 @@ class FragmentPokusaj : Fragment() {
     }
     fun initFragments(): ArrayList<FragmentPitanje> {
         val fragmenti : ArrayList<FragmentPitanje> = arrayListOf()
-        for (i in 0 until pitanja.size) fragmenti.add(FragmentPitanje.newInstance(pitanja.get(i)))
+        for (i in pitanja.indices) fragmenti.add(FragmentPitanje.newInstance(pitanja.get(i)))
         return fragmenti
     }
 
@@ -115,12 +113,13 @@ class FragmentPokusaj : Fragment() {
         if (colorAnswer) {
             colorString = "#3DDC84"
             brojTacnoOdgovorenih++
+            updateProcenatTacnosti()
         }
         spanString.setSpan(ForegroundColorSpan(Color.parseColor(colorString)), 0, spanString.length, 0)
         (navigacijaPitanja.menu.getItem(position) as MenuItem).title = spanString
     }
-    fun procenatTacnosti(): Float {
-        return (brojTacnoOdgovorenih.toFloat() / pitanja.size)
+    fun updateProcenatTacnosti() {
+        odgovor.procenatTacnosti = brojTacnoOdgovorenih.toFloat() / pitanja.size
     }
 
 }

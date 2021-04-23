@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import ba.etf.rma21.projekat.R
+import ba.etf.rma21.projekat.viewmodel.KvizViewModel
 
 
 class FragmentPoruka : Fragment() {
@@ -25,6 +26,11 @@ class FragmentPoruka : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view =  inflater.inflate(R.layout.fragment_poruka, container, false)
+        if (message!!.startsWith("Uspješno")){
+            KvizViewModel.odabranaGodina = 0
+            KvizViewModel.odabraniPredmet = -1
+            KvizViewModel.odabranaGrupa = -1
+        }
         val textView : TextView= view.findViewById(R.id.tvPoruka)
         textView.text = message
         return view

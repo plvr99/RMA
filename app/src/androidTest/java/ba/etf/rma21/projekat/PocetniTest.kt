@@ -5,16 +5,18 @@ import androidx.test.espresso.Espresso.onView
 import androidx.test.espresso.action.ViewActions.click
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.intent.rule.IntentsTestRule
-import androidx.test.espresso.matcher.ViewMatchers.*
+import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
+import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import ba.etf.rma21.projekat.UtilTestClass.Companion.hasItemCount
 import ba.etf.rma21.projekat.UtilTestClass.Companion.itemTest
 import ba.etf.rma21.projekat.data.repositories.KvizRepository
-import org.hamcrest.CoreMatchers.*
-import org.hamcrest.CoreMatchers.`is` as Is
+import org.hamcrest.CoreMatchers.allOf
+import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.hamcrest.CoreMatchers.`is` as Is
 
 @RunWith(AndroidJUnit4::class)
 class PocetniTest {
@@ -27,15 +29,9 @@ class PocetniTest {
 
         onView(withId(R.id.filterKvizova)).check(matches(isDisplayed()))
         onView(withId(R.id.listaKvizova)).check(matches(isDisplayed()))
-        onView(withId(R.id.upisDugme)).check(matches(isDisplayed()))
+        onView(withId(R.id.bottomNav)).check(matches(isDisplayed()))
 
-        var listaOdabira = listOf<String>(
-            "Svi moji kvizovi",
-            "Svi kvizovi",
-            "Urađeni kvizovi",
-            "Budući kvizovi",
-            "Prošli kvizovi"
-        )
+        var listaOdabira = listOf<String>("Svi moji kvizovi", "Svi kvizovi", "Urađeni kvizovi", "Budući kvizovi", "Prošli kvizovi")
 
         for (odabir in listaOdabira) {
             onView(withId(R.id.filterKvizova)).perform(click())
@@ -59,7 +55,7 @@ class PocetniTest {
 
     @Test
     fun godineTest() {
-        onView(withId(R.id.upisDugme)).perform(click())
+        onView(withId(R.id.predmeti)).perform(click())
         var listaOdabira = listOf<String>("1", "2", "3", "4", "5")
         for (odabir in listaOdabira) {
             onView(withId(R.id.odabirGodina)).perform(click())

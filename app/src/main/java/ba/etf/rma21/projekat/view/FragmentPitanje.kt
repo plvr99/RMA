@@ -2,7 +2,6 @@ package ba.etf.rma21.projekat.view
 
 import android.graphics.Color
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +9,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.TextView
+import androidx.fragment.app.Fragment
 import ba.etf.rma21.projekat.R
 import ba.etf.rma21.projekat.data.models.Pitanje
 
@@ -36,17 +36,21 @@ class FragmentPitanje : Fragment() {
         naslov = view.findViewById(R.id.tekstPitanja)
         naslov.text = pitanje?.tekst ?: ""
         ponudjeniOdgovori = view.findViewById(R.id.odgovoriLista)
+        val adapter : ArrayAdapter<String> = ArrayAdapter(view.context!!,
+            android.R.layout.simple_spinner_item,
+            pitanje!!.opcije!!)
 
         val adapterOdgovori= object : ArrayAdapter<String>(
             view.context!!,
             android.R.layout.simple_spinner_item,
             pitanje!!.opcije!!
-        ){
+        )
+        {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 val text = super.getView(position, convertView, parent)
                 if(odgovorenaPozicija != -1) {
-                    if (position == pitanje!!.tacan!!) (text as TextView).setTextColor(Color.parseColor("#3DDC84"))
-                    if (position == odgovorenaPozicija && odgovorenaPozicija != pitanje!!.tacan) (text as TextView).setTextColor(Color.parseColor("#DB4F3D"))
+                    if (position == pitanje!!.tacan!!) (text as TextView).setBackgroundColor(Color.parseColor("#3DDC84"))
+                    if (position == odgovorenaPozicija && odgovorenaPozicija != pitanje!!.tacan) (text as TextView).setBackgroundColor(Color.parseColor("#DB4F3D"))
                 }
                     return text
             }
@@ -67,11 +71,11 @@ class FragmentPitanje : Fragment() {
 
     private fun colorAnswer(view: View?, redniBroj: Int) :Boolean {
         val text = view as TextView
-        if(redniBroj.equals(pitanje!!.tacan)) text.setTextColor(Color.parseColor("#3DDC84")) //Zelena
+        if(redniBroj.equals(pitanje!!.tacan)) text.setBackgroundColor(Color.parseColor("#3DDC84")) //Zelena
         else{
-            text.setTextColor(Color.parseColor("#DB4F3D"))//crvena
+            text.setBackgroundColor(Color.parseColor("#DB4F3D"))//crvena
             //ponudjeniOdgovori.performItemClick(ponudjeniOdgovori.getChildAt(pitanje!!.tacan!!), pitanje!!.tacan!!, ponudjeniOdgovori.adapter.getItemId(pitanje!!.tacan!!))
-            (ponudjeniOdgovori.getChildAt(pitanje!!.tacan!!) as TextView).setTextColor(Color.parseColor("#3DDC84"))
+            (ponudjeniOdgovori.getChildAt(pitanje!!.tacan!!) as TextView).setBackgroundColor(Color.parseColor("#3DDC84"))
             return false
         }
         return true

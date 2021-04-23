@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:id="@+id/navigation_kvizovi"
+        android:id="@+id/kvizovi"
         android:icon="@android:drawable/ic_dialog_dialer"
         android:title="Kvizovi" />
     <item
-        android:id="@+id/navigation_predmeti"
+        android:id="@+id/predmeti"
         android:icon="@android:drawable/ic_menu_add"
         android:title="Predmeti" />
     <item

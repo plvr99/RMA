@@ -26,19 +26,18 @@ class UpisTest {
 
         Espresso.onView(ViewMatchers.withId(R.id.filterKvizova)).perform(ViewActions.click())
         Espresso.onData(
-            CoreMatchers.allOf(
-                CoreMatchers.`is`(CoreMatchers.instanceOf(String::class.java)),
-                CoreMatchers.`is`("Svi moji kvizovi")
-            )
+                CoreMatchers.allOf(
+                        CoreMatchers.`is`(CoreMatchers.instanceOf(String::class.java)),
+                        CoreMatchers.`is`("Svi moji kvizovi")
+                )
         ).perform(ViewActions.click())
         val kvizoviPrije = KvizRepository.getMyKvizes()
         val kvizoviPrijeSize = kvizoviPrije.size
-        Espresso.onView(ViewMatchers.withId(R.id.listaKvizova))
-            .check(hasItemCount(kvizoviPrije.size))
+        Espresso.onView(ViewMatchers.withId(R.id.listaKvizova)).check(hasItemCount(kvizoviPrije.size))
         for (kviz in kvizoviPrije) {
             itemTest(R.id.listaKvizova, kviz)
         }
-        Espresso.onView(ViewMatchers.withId(R.id.upisDugme)).perform(ViewActions.click())
+        Espresso.onView(ViewMatchers.withId(R.id.predmeti)).perform(ViewActions.click())
         Espresso.onView(ViewMatchers.withId(R.id.odabirGodina)).perform(ViewActions.click())
         val nedodjeljeniKvizovi = KvizRepository.getAll().minus(KvizRepository.getMyKvizes())
         val nedodjeljeniPredmeti = PredmetRepository.getAll().minus(PredmetRepository.getUpisani())
@@ -57,52 +56,52 @@ class UpisTest {
             }
         }
         ViewMatchers.assertThat(
-            "Nema neupisanih predmeta sa kvizovima",
-            godinaVrijednost,
-            CoreMatchers.not(CoreMatchers.`is`(-1))
+                "Nema neupisanih predmeta sa kvizovima",
+                godinaVrijednost,
+                CoreMatchers.not(CoreMatchers.`is`(-1))
         )
 
         Espresso.onData(
-            CoreMatchers.allOf(
-                CoreMatchers.`is`(CoreMatchers.instanceOf(String::class.java)),
-                CoreMatchers.`is`(godinaVrijednost.toString())
-            )
+                CoreMatchers.allOf(
+                        CoreMatchers.`is`(CoreMatchers.instanceOf(String::class.java)),
+                        CoreMatchers.`is`(godinaVrijednost.toString())
+                )
         ).perform(ViewActions.click())
         Espresso.onView(ViewMatchers.withId(R.id.odabirPredmet)).perform(ViewActions.click())
         Espresso.onData(
-            CoreMatchers.allOf(
-                CoreMatchers.`is`(CoreMatchers.instanceOf(String::class.java)),
-                CoreMatchers.`is`(predmetNaziv)
-            )
+                CoreMatchers.allOf(
+                        CoreMatchers.`is`(CoreMatchers.instanceOf(String::class.java)),
+                        CoreMatchers.`is`(predmetNaziv)
+                )
         ).perform(ViewActions.click())
         Espresso.onView(ViewMatchers.withId(R.id.odabirGrupa)).perform(ViewActions.click())
         Espresso.onData(
-            CoreMatchers.allOf(
-                CoreMatchers.`is`(CoreMatchers.instanceOf(String::class.java)),
-                CoreMatchers.`is`(grupaVrijednost)
-            )
+                CoreMatchers.allOf(
+                        CoreMatchers.`is`(CoreMatchers.instanceOf(String::class.java)),
+                        CoreMatchers.`is`(grupaVrijednost)
+                )
         ).perform(ViewActions.click())
         Espresso.onView(ViewMatchers.withId(R.id.dodajPredmetDugme)).perform(ViewActions.click())
-
+        Espresso.onView(ViewMatchers.withSubstring("Uspješno ste upisani u grupu"))
+        Espresso.onView(ViewMatchers.withId(R.id.kvizovi)).perform(ViewActions.click())
         Espresso.onView(ViewMatchers.withId(R.id.filterKvizova)).perform(ViewActions.click())
         Espresso.onData(
-            CoreMatchers.allOf(
-                CoreMatchers.`is`(CoreMatchers.instanceOf(String::class.java)),
-                CoreMatchers.`is`("Svi moji kvizovi")
-            )
+                CoreMatchers.allOf(
+                        CoreMatchers.`is`(CoreMatchers.instanceOf(String::class.java)),
+                        CoreMatchers.`is`("Svi moji kvizovi")
+                )
         ).perform(ViewActions.click())
         val kvizoviPoslije = KvizRepository.getMyKvizes()
 
-        Espresso.onView(ViewMatchers.withId(R.id.listaKvizova))
-            .check(hasItemCount(kvizoviPoslije.size))
+        Espresso.onView(ViewMatchers.withId(R.id.listaKvizova)).check(hasItemCount(kvizoviPoslije.size))
         for (kviz in kvizoviPoslije) {
             itemTest(R.id.listaKvizova, kviz)
         }
 
         ViewMatchers.assertThat(
-            "Nije dodan kviz nakon upisanog predmeta ",
-            kvizoviPrijeSize,
-            CoreMatchers.`is`(Matchers.lessThan(kvizoviPoslije.size))
+                "Nije dodan kviz nakon upisanog predmeta ",
+                kvizoviPrijeSize,
+                CoreMatchers.`is`(Matchers.lessThan(kvizoviPoslije.size))
         )
 
     }
