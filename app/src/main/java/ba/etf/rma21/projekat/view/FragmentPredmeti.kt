@@ -183,7 +183,7 @@ class FragmentPredmeti : Fragment() {
         spinnerGrupa.setSelection(KvizViewModel.odabranaGrupa)
         Handler().postDelayed({
             spinnerGrupa.setSelection(KvizViewModel.odabranaGrupa)
-        }, 50)
+        }, 100)
 
     }
 

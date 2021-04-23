@@ -9,6 +9,7 @@ import ba.etf.rma21.projekat.view.FragmentKvizovi
 import ba.etf.rma21.projekat.view.FragmentPokusaj
 import ba.etf.rma21.projekat.view.FragmentPoruka
 import ba.etf.rma21.projekat.view.FragmentPredmeti
+import ba.etf.rma21.projekat.viewmodel.KvizViewModel
 import ba.etf.rma21.projekat.viewmodel.PitanjeKvizViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -47,7 +48,10 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.zaustaviKviz -> {
                     //saqcuvaj odgovore
-                    onBackPressed()
+                    sacuvajOdgovor((getVisibleFragment() as FragmentPokusaj).odgovor, false)
+                    hideMenuItems(arrayListOf(2, 3))
+                    while (supportFragmentManager.backStackEntryCount > 1) supportFragmentManager.popBackStackImmediate()
+                    bottomNavigation.selectedItemId = R.id.kvizovi
                     return@OnNavigationItemSelectedListener true
                 }
             }
@@ -78,10 +82,13 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
+
         //ako je pokusaj sacuvaj odgovore pa zatvori
-        if (getVisibleFragment() is FragmentPokusaj)
-            sacuvajOdgovor((getVisibleFragment() as FragmentPokusaj).odgovor, false)
+        if (getVisibleFragment() is FragmentPokusaj || getVisibleFragment() is FragmentKvizovi)
+            return
         while (supportFragmentManager.backStackEntryCount > 1) supportFragmentManager.popBackStackImmediate()
+        println("odabrani viskooo "  + KvizViewModel.odabraniKvizovi)
+        ( supportFragmentManager.fragments[0] as FragmentKvizovi).prikaziKvizoveSaOpcijom(KvizViewModel.odabraniKvizovi)
         bottomNavigation.selectedItemId = R.id.kvizovi
 
     }

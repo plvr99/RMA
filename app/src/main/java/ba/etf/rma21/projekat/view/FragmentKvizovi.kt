@@ -40,7 +40,7 @@ class FragmentKvizovi : Fragment() {
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.adapter = adapter
         }
-        spinner.setSelection(KvizViewModel.odabraniKvizovi)
+
         spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener{
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
                 prikaziKvizoveSaOpcijom(position)
@@ -49,6 +49,7 @@ class FragmentKvizovi : Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>?) {
             }
         }
+        spinner.setSelection(KvizViewModel.odabraniKvizovi)
         return view
     }
     override fun onResume() {
@@ -67,6 +68,7 @@ class FragmentKvizovi : Fragment() {
             3 ->{kvizAdapter.updateList(kvizViewModel.getFuture().sortedBy { kviz -> kviz.datumPocetka })}
             4 ->{kvizAdapter.updateList(kvizViewModel.getNotTaken().sortedBy { kviz -> kviz.datumPocetka })}
         }
+        spinner.setSelection(position)
     }
 
     private fun otvoriKviz(kviz : Kviz){
