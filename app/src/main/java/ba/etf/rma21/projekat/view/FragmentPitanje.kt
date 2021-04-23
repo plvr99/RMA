@@ -36,13 +36,9 @@ class FragmentPitanje : Fragment() {
         naslov = view.findViewById(R.id.tekstPitanja)
         naslov.text = pitanje?.tekst ?: ""
         ponudjeniOdgovori = view.findViewById(R.id.odgovoriLista)
-        val adapter : ArrayAdapter<String> = ArrayAdapter(view.context!!,
-            android.R.layout.simple_spinner_item,
-            pitanje!!.opcije!!)
-
         val adapterOdgovori= object : ArrayAdapter<String>(
             view.context!!,
-            android.R.layout.simple_spinner_item,
+            android.R.layout.simple_list_item_1,
             pitanje!!.opcije!!
         )
         {
