@@ -19,7 +19,6 @@ class FragmentPitanje : Fragment() {
     private lateinit var naslov : TextView
     var odgovorenaPozicija : Int = -1
     var zavrseno : Boolean = false
-    //private var parentFragmentPokusaj : FragmentPokusaj = parentFragment as FragmentPokusaj
     var tacnoOdgovoreno : Boolean? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,7 +26,6 @@ class FragmentPitanje : Fragment() {
             pitanje = it.getParcelable("pitanje")
         }
     }
-//todo ukinuti getview, bojiti preko funkcije i odgovorene pozicije
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -37,9 +35,6 @@ class FragmentPitanje : Fragment() {
         naslov = view.findViewById(R.id.tekstPitanja)
         naslov.text = pitanje?.tekst ?: ""
         ponudjeniOdgovori = view.findViewById(R.id.odgovoriLista)
-        println("pitanje tacan = " + pitanje!!.tacan!!)
-    println("odgovorena pozicija = " + odgovorenaPozicija)
-    println("zavrseno = " + zavrseno.toString())
         val adapterOdgovori= object : ArrayAdapter<String>(
             view.context!!,
             android.R.layout.simple_list_item_1,
@@ -49,13 +44,10 @@ class FragmentPitanje : Fragment() {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
                 println("POSITIONNNN $position")
                 val text = super.getView(position, convertView, parent)
-                    //ako nisam nista odgovoarao, odgovorenaPozicija =-1 & zavrseno je false - nista se nece bojiti
                 if (position == pitanje!!.tacan!! && zavrseno) text.setBackgroundColor(Color.parseColor("#3DDC84")) //Zelena
                 if(position == odgovorenaPozicija) {
                     if (zavrseno && odgovorenaPozicija != -1) {
-
                         if ( odgovorenaPozicija != pitanje!!.tacan!!) text.setBackgroundColor(Color.parseColor("#DB4F3D"))//crvena
-
                     }
                 }
                 return text
@@ -78,8 +70,6 @@ class FragmentPitanje : Fragment() {
     }
 
     private fun colorAnswer(view: View?, redniBroj: Int) :Boolean {
-        // TODO: 25.4.2021 popraviti za -1
-        if (redniBroj == -1) return false
         val text = view as TextView
         if(redniBroj.equals(pitanje!!.tacan)) text.setBackgroundColor(Color.parseColor("#3DDC84")) //Zelena
         else{

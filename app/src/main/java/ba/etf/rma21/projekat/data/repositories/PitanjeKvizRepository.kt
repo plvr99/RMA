@@ -24,7 +24,7 @@ class PitanjeKvizRepository {
         fun getPitanja(nazivKviza: String, nazivPredmeta: String): List<Pitanje> {
             return pitanja.filter { pitanje -> getNazivPitanjaKviz(nazivKviza, nazivPredmeta).contains(pitanje.naziv) }
         }
-        fun getNazivPitanjaKviz(nazivKviza: String, nazivPredmeta: String): List<String> {
+        private fun getNazivPitanjaKviz(nazivKviza: String, nazivPredmeta: String): List<String> {
             return lista.filter { pitanjeKviz -> pitanjeKviz.kviz.equals(nazivKviza)
                     && pitanjeKviz.nazivPredmeta.equals(nazivPredmeta)}.map { pitanjeKviz -> pitanjeKviz.naziv }
         }

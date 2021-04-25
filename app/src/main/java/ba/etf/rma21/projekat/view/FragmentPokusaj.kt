@@ -21,7 +21,7 @@ import com.google.android.material.navigation.NavigationView
 import java.util.*
 
 class FragmentPokusaj : Fragment() {
-    private lateinit var navigacijaPitanja : NavigationView
+    lateinit var navigacijaPitanja : NavigationView
     private lateinit var pitanjeFrame : FrameLayout
     private lateinit var pitanja : List<Pitanje>
     var pitanjeKvizViewModel : PitanjeKvizViewModel = PitanjeKvizViewModel()
@@ -30,13 +30,13 @@ class FragmentPokusaj : Fragment() {
     private lateinit var nazivGrupe : String
     lateinit var odgovor: Odgovor
     private var selectedPitanje : Int? = null
-    var brojTacnoOdgovorenih : Int = 0
+    private var brojTacnoOdgovorenih : Int = 0
     private val mOnNavigationItemSelectedListener = NavigationView.OnNavigationItemSelectedListener {
             item ->
         if(item.title.equals("Rezultat")){
-            val poruka = "Završili ste kviz ${nazivKviza} sa tačnosti ${odgovor.procenatTacnosti * 100} %"
+            val poruka = "Završili ste kviz $nazivKviza sa tačnosti ${odgovor.procenatTacnosti * 100} %"
             val frag = FragmentPoruka.newInstance(poruka)
-            activity!!.supportFragmentManager.beginTransaction().replace(R.id.container, frag, "poruka").addToBackStack(null).commit()
+            childFragmentManager.beginTransaction().replace(R.id.framePitanje, frag, "poruka").addToBackStack(null).commit()
             (activity as MainActivity).hideMenuItems(arrayListOf(2,3))
         }
         else {
@@ -53,12 +53,12 @@ class FragmentPokusaj : Fragment() {
             nazivPredmeta = it.getString("nazivPredmeta")!!
             nazivGrupe = it.getString("nazivGrupe")!!
         }
-        println("PITANJAAAAAAAAAAAAAA")
+
         println(pitanja)
-        if (pitanjeKvizViewModel.pronadjiOdgovorZaKviz(nazivKviza, nazivPredmeta, nazivGrupe) != null){
-            odgovor = pitanjeKvizViewModel.pronadjiOdgovorZaKviz(nazivKviza, nazivPredmeta, nazivGrupe)!!
-        }
-        else odgovor = Odgovor(nazivKviza, nazivPredmeta, nazivGrupe, initFragments())
+        odgovor =
+            if (pitanjeKvizViewModel.pronadjiOdgovorZaKviz(nazivKviza, nazivPredmeta, nazivGrupe) != null){
+                pitanjeKvizViewModel.pronadjiOdgovorZaKviz(nazivKviza, nazivPredmeta, nazivGrupe)!!
+            } else Odgovor(nazivKviza, nazivPredmeta, nazivGrupe, initFragments())
     }
 
     override fun onCreateView(
@@ -86,7 +86,7 @@ class FragmentPokusaj : Fragment() {
 
     companion object {
         fun newInstance(pitanja : List<Pitanje>, nazivKviza : String, nazivPredmeta : String, nazivGrupe : String) : FragmentPokusaj{
-            val fragment = FragmentPokusaj();
+            val fragment = FragmentPokusaj()
             val args = Bundle()
             args.putParcelableArrayList("pitanja", pitanja as ArrayList<out Parcelable>)
             args.putString("nazivKviza", nazivKviza)
@@ -96,13 +96,13 @@ class FragmentPokusaj : Fragment() {
             return fragment
         }
     }
-    fun initFragments(): ArrayList<FragmentPitanje> {
+    private fun initFragments(): ArrayList<FragmentPitanje> {
         val fragmenti : ArrayList<FragmentPitanje> = arrayListOf()
         for (i in pitanja.indices) fragmenti.add(FragmentPitanje.newInstance(pitanja.get(i)))
         return fragmenti
     }
 
-    fun postaviPitanje(brojPitanja: Int) {
+    private fun postaviPitanje(brojPitanja: Int) {
         val nextFrag = odgovor.pitanja.get(brojPitanja-1)
         childFragmentManager.beginTransaction().replace(R.id.framePitanje, nextFrag, "FRAG_PITANJE").addToBackStack(null).commit()
     }
@@ -119,7 +119,7 @@ class FragmentPokusaj : Fragment() {
         spanString.setSpan(ForegroundColorSpan(Color.parseColor(colorString)), 0, spanString.length, 0)
         (navigacijaPitanja.menu.getItem(position) as MenuItem).title = spanString
     }
-    fun updateProcenatTacnosti() {
+    private fun updateProcenatTacnosti() {
         odgovor.procenatTacnosti = brojTacnoOdgovorenih.toFloat() / pitanja.size
     }
 

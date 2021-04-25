@@ -23,7 +23,7 @@ class KvizAdapter(private var kvizovi : List<Kviz>, private val onItemClicked: (
         holder.kvizNazivPredmeta.text = kvizovi[position].nazivPredmeta
         holder.kvizNaziv.text = kvizovi[position].naziv
         holder.kvizBodovi.text = kvizovi[position].osvojeniBodovi.toString()
-        holder.kvizTrajanje.text = kvizovi[position].trajanje.toString() + " min"
+        (kvizovi[position].trajanje.toString() + " min").also { holder.kvizTrajanje.text = it }
         kvizovi[position].odrediTipKviza().also {
             postaviSlikuIDatum(it, holder, kvizovi[position])
         }
@@ -31,7 +31,7 @@ class KvizAdapter(private var kvizovi : List<Kviz>, private val onItemClicked: (
     }
     fun updateList(newList : List<Kviz>){
         kvizovi = newList
-        notifyDataSetChanged();
+        notifyDataSetChanged()
     }
     override fun getItemCount(): Int {
        return  kvizovi.size

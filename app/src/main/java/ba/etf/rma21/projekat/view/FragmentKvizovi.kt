@@ -22,7 +22,6 @@ class FragmentKvizovi : Fragment() {
     private lateinit var kvizAdapter: KvizAdapter
     private lateinit var spinner: Spinner
     private var kvizViewModel : KvizViewModel = KvizViewModel()
-    //new
     private var pitanjeKvizViewModel : PitanjeKvizViewModel = PitanjeKvizViewModel()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,

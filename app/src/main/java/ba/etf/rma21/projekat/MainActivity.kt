@@ -40,11 +40,12 @@ class MainActivity : AppCompatActivity() {
                     val string =
                         "Završili ste kviz ${frag.nazivKviza} sa tačnosti ${frag.odgovor.procenatTacnosti * 100} %"
                     val poruka = FragmentPoruka.newInstance(string)
-                    //sacuvaj odgovore
                     disableSelectionOdgovora(frag.odgovor)
                     sacuvajOdgovor(frag.odgovor, true)
                     hideMenuItems(arrayListOf(2, 3))
-                    openFragment(poruka, "poruka")
+                    frag.navigacijaPitanja.menu.get(frag.navigacijaPitanja.menu.size()-1).isVisible = true
+                    frag.childFragmentManager.beginTransaction().replace(R.id.framePitanje, poruka, "poruka").addToBackStack(null).commit()
+                    //openFragment(poruka, "poruka")
                 }
                 R.id.zaustaviKviz -> {
                     //saqcuvaj odgovore
@@ -95,9 +96,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun getVisibleFragment(): Fragment? {
         val fragmentManager = this@MainActivity.supportFragmentManager
-        for (fragment in fragmentManager.fragments) {
+        for (fragment in fragmentManager.fragments)
             if (fragment != null && fragment.isVisible) return fragment
-        }
         return null
     }
 
@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity() {
     private fun disableSelectionOdgovora(odgovor: Odgovor) {
         //disableat ce svaki list view fragmenata
         for (i in 0 until odgovor.pitanja.size)
-            if (odgovor.pitanja.get(i).odgovorenaPozicija == -1) odgovor.pitanja.get(i).zavrseno = true
+            odgovor.pitanja.get(i).zavrseno = true
     }
 
     private fun sacuvajOdgovor(odgovor: Odgovor, zavrseno: Boolean) {
