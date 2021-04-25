@@ -12,7 +12,7 @@ class KvizViewModelTest : TestCase() {
     @Test
     fun testGetMyKvizes() {
         assertTrue(!kvizViewModel.getMyKvizes().isEmpty())
-        assertEquals(4, kvizViewModel.getMyKvizes().size)
+        assertEquals(5, kvizViewModel.getMyKvizes().size)
     }
     @Test
     fun testGetAll() {
