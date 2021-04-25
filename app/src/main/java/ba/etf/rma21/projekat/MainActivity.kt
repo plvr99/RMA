@@ -110,7 +110,7 @@ class MainActivity : AppCompatActivity() {
     private fun disableSelectionOdgovora(odgovor: Odgovor) {
         //disableat ce svaki list view fragmenata
         for (i in 0 until odgovor.pitanja.size)
-            if (odgovor.pitanja.get(i).odgovorenaPozicija == -1) odgovor.pitanja.get(i).odgovorenaPozicija = -2
+            if (odgovor.pitanja.get(i).odgovorenaPozicija == -1) odgovor.pitanja.get(i).zavrseno = true
     }
 
     private fun sacuvajOdgovor(odgovor: Odgovor, zavrseno: Boolean) {

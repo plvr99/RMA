@@ -18,6 +18,7 @@ class FragmentPitanje : Fragment() {
     private lateinit var ponudjeniOdgovori : ListView
     private lateinit var naslov : TextView
     var odgovorenaPozicija : Int = -1
+    var zavrseno : Boolean = false
     //private var parentFragmentPokusaj : FragmentPokusaj = parentFragment as FragmentPokusaj
     var tacnoOdgovoreno : Boolean? = null
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,7 +27,7 @@ class FragmentPitanje : Fragment() {
             pitanje = it.getParcelable("pitanje")
         }
     }
-
+//todo ukinuti getview, bojiti preko funkcije i odgovorene pozicije
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -36,6 +37,9 @@ class FragmentPitanje : Fragment() {
         naslov = view.findViewById(R.id.tekstPitanja)
         naslov.text = pitanje?.tekst ?: ""
         ponudjeniOdgovori = view.findViewById(R.id.odgovoriLista)
+        println("pitanje tacan = " + pitanje!!.tacan!!)
+    println("odgovorena pozicija = " + odgovorenaPozicija)
+    println("zavrseno = " + zavrseno.toString())
         val adapterOdgovori= object : ArrayAdapter<String>(
             view.context!!,
             android.R.layout.simple_list_item_1,
@@ -43,16 +47,22 @@ class FragmentPitanje : Fragment() {
         )
         {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+                println("POSITIONNNN $position")
                 val text = super.getView(position, convertView, parent)
-                if(odgovorenaPozicija != -1) {
-                    if (position == pitanje!!.tacan!!) (text as TextView).setBackgroundColor(Color.parseColor("#3DDC84"))
-                    if (position == odgovorenaPozicija && odgovorenaPozicija != pitanje!!.tacan) (text as TextView).setBackgroundColor(Color.parseColor("#DB4F3D"))
+                    //ako nisam nista odgovoarao, odgovorenaPozicija =-1 & zavrseno je false - nista se nece bojiti
+                if (position == pitanje!!.tacan!! && zavrseno) text.setBackgroundColor(Color.parseColor("#3DDC84")) //Zelena
+                if(position == odgovorenaPozicija) {
+                    if (zavrseno && odgovorenaPozicija != -1) {
+
+                        if ( odgovorenaPozicija != pitanje!!.tacan!!) text.setBackgroundColor(Color.parseColor("#DB4F3D"))//crvena
+
+                    }
                 }
-                    return text
+                return text
             }
         }
         ponudjeniOdgovori.adapter = adapterOdgovori
-        if(odgovorenaPozicija != -1 || odgovorenaPozicija ==-2) ponudjeniOdgovori.isEnabled=false
+        if(odgovorenaPozicija != -1 || zavrseno) ponudjeniOdgovori.isEnabled=false
         ponudjeniOdgovori.onItemClickListener = object : AdapterView.OnItemClickListener{
             override fun onItemClick(
                 parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
@@ -60,17 +70,20 @@ class FragmentPitanje : Fragment() {
                 (parentFragment as FragmentPokusaj).colorPitanje(tacnoOdgovoreno!!)
                 ponudjeniOdgovori.isEnabled=false
                 odgovorenaPozicija = position
+                zavrseno = true
             }
         }
+
         return view
     }
 
     private fun colorAnswer(view: View?, redniBroj: Int) :Boolean {
+        // TODO: 25.4.2021 popraviti za -1
+        if (redniBroj == -1) return false
         val text = view as TextView
         if(redniBroj.equals(pitanje!!.tacan)) text.setBackgroundColor(Color.parseColor("#3DDC84")) //Zelena
         else{
             text.setBackgroundColor(Color.parseColor("#DB4F3D"))//crvena
-            //ponudjeniOdgovori.performItemClick(ponudjeniOdgovori.getChildAt(pitanje!!.tacan!!), pitanje!!.tacan!!, ponudjeniOdgovori.adapter.getItemId(pitanje!!.tacan!!))
             (ponudjeniOdgovori.getChildAt(pitanje!!.tacan!!) as TextView).setBackgroundColor(Color.parseColor("#3DDC84"))
             return false
         }

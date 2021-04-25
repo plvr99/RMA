@@ -32,11 +32,12 @@ class FragmentPokusaj : Fragment() {
     private var selectedPitanje : Int? = null
     var brojTacnoOdgovorenih : Int = 0
     private val mOnNavigationItemSelectedListener = NavigationView.OnNavigationItemSelectedListener {
-        item ->
+            item ->
         if(item.title.equals("Rezultat")){
             val poruka = "Završili ste kviz ${nazivKviza} sa tačnosti ${odgovor.procenatTacnosti * 100} %"
             val frag = FragmentPoruka.newInstance(poruka)
-            activity!!.supportFragmentManager.beginTransaction().replace(R.id.container, frag, "poruka").commit()
+            activity!!.supportFragmentManager.beginTransaction().replace(R.id.container, frag, "poruka").addToBackStack(null).commit()
+            (activity as MainActivity).hideMenuItems(arrayListOf(2,3))
         }
         else {
             selectedPitanje = item.title.toString().toInt() - 1
@@ -56,7 +57,7 @@ class FragmentPokusaj : Fragment() {
         println(pitanja)
         if (pitanjeKvizViewModel.pronadjiOdgovorZaKviz(nazivKviza, nazivPredmeta, nazivGrupe) != null){
             odgovor = pitanjeKvizViewModel.pronadjiOdgovorZaKviz(nazivKviza, nazivPredmeta, nazivGrupe)!!
-            }
+        }
         else odgovor = Odgovor(nazivKviza, nazivPredmeta, nazivGrupe, initFragments())
     }
 
@@ -77,7 +78,7 @@ class FragmentPokusaj : Fragment() {
             colorPitanje(odgovor.pitanja.get(i).tacnoOdgovoreno, i)
 
         if(odgovor.zavrseno) {
-                (activity as MainActivity).hideMenuItems(arrayListOf(0,1,2,3))
+            (activity as MainActivity).hideMenuItems(arrayListOf(2,3))
             navigacijaPitanja.menu.get(pitanja.size).isVisible = true
         }
         return view
