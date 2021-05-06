@@ -55,6 +55,7 @@ class OdgovoriTest {
             .perform(NavigationViewActions.navigateTo(indeks))
         val odgovori = pitanje.opcije
         val tacan = pitanje.tacan
+        // kod varijable odgovori je dodan non-null assertion (!!)
         onData(allOf(`is`(instanceOf(String::class.java)), `is`(odgovori!![tacan!!]))).inAdapterView(withId(R.id.odgovoriLista)).perform(click())
         onData(allOf(`is`(instanceOf(String::class.java)), `is`(odgovori[tacan]))).inAdapterView(
             allOf(withId(R.id.odgovoriLista), hasDescendant(anyOf(
