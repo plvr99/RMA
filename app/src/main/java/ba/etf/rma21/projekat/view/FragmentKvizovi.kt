@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ba.etf.rma21.projekat.MainActivity
 import ba.etf.rma21.projekat.R
 import ba.etf.rma21.projekat.data.models.Kviz
+import ba.etf.rma21.projekat.data.models.Pitanje
 import ba.etf.rma21.projekat.viewmodel.KvizViewModel
 import ba.etf.rma21.projekat.viewmodel.PitanjeKvizViewModel
 
@@ -29,13 +30,13 @@ class FragmentKvizovi : Fragment() {
         val view = inflater.inflate(R.layout.fragment_kvizovi, container, false)
         kvizoviRecyclerView = view.findViewById(R.id.listaKvizova)
         kvizoviRecyclerView.layoutManager = GridLayoutManager(activity,2,RecyclerView.VERTICAL,false)
-
-        kvizAdapter = KvizAdapter(kvizViewModel.getAll()) {kviz -> otvoriKviz(kviz) }
-        kvizoviRecyclerView.adapter = kvizAdapter
-
         spinner = view.findViewById(R.id.filterKvizova)
+        kvizAdapter = KvizAdapter(arrayListOf()) { kviz -> otvoriKviz(kviz) }
+        kvizoviRecyclerView.adapter = kvizAdapter
+//        kvizAdapter.updateList(arrayListOf())
+      //  kvizViewModel.init(initFunc = ::adapterStart)
 
-        ArrayAdapter.createFromResource(context!!, R.array.spinner_choice_array, android.R.layout.simple_spinner_item).also { adapter ->
+        ArrayAdapter.createFromResource(requireContext(), R.array.spinner_choice_array, android.R.layout.simple_spinner_item).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             spinner.adapter = adapter
         }
@@ -59,35 +60,57 @@ class FragmentKvizovi : Fragment() {
     companion object {
         fun newInstance(): FragmentKvizovi = FragmentKvizovi()
     }
+
+    private fun adapterStart(kvizovi : List<Kviz>){
+        kvizAdapter = KvizAdapter(kvizovi) { kviz -> otvoriKviz(kviz) }
+        kvizoviRecyclerView.adapter = kvizAdapter
+    }
+
     fun prikaziKvizoveSaOpcijom(position: Int){
         when(position){
-            0 ->{kvizAdapter.updateList(kvizViewModel.getMyKvizes().sortedBy { kviz -> kviz.datumPocetka })}
-            1 ->{kvizAdapter.updateList(kvizViewModel.getAll().sortedBy { kviz -> kviz.datumPocetka })}
-            2 ->{kvizAdapter.updateList(kvizViewModel.getDone().sortedBy { kviz -> kviz.datumPocetka })}
-            3 ->{kvizAdapter.updateList(kvizViewModel.getFuture().sortedBy { kviz -> kviz.datumPocetka })}
-            4 ->{kvizAdapter.updateList(kvizViewModel.getNotTaken().sortedBy { kviz -> kviz.datumPocetka })}
+            0 ->kvizViewModel.getMyKvizes(showKvizovi = ::showKvizovi)
+            1 ->kvizViewModel.getAll(showKvizovi = ::showKvizovi)
+            2 ->kvizViewModel.getDone(showKvizovi = ::showKvizovi)
+            3 ->kvizViewModel.getFuture(showKvizovi = ::showKvizovi)
+            4 ->kvizViewModel.getNotTaken(showKvizovi = ::showKvizovi)
         }
         spinner.setSelection(position)
     }
 
-    private fun otvoriKviz(kviz : Kviz){
-        val pitanja = pitanjeKvizViewModel.getPitanja(kviz.naziv, kviz.nazivPredmeta)
-        when {
-            kviz.odrediTipKviza() != 2 -> Toast.makeText(context, "Ne mozete pristupiti ovom kvizu", Toast.LENGTH_SHORT).show()
-            pitanja.isEmpty() -> Toast.makeText(context, "Nema pitanja za ovaj kviz", Toast.LENGTH_SHORT).show()
-            else -> {
-                val nextFrag = FragmentPokusaj.newInstance(
-                    pitanja,
-                    kviz.naziv, kviz.nazivPredmeta, kviz.nazivGrupe
-                )
-                activity!!.supportFragmentManager.beginTransaction()
-                    .replace(R.id.container, nextFrag, "FRAG_POKUSAJ")
-                    .addToBackStack(null)
-                    .commit()
-                val activity = activity as MainActivity
-                activity.hideMenuItems(arrayListOf(0, 1))
-            }
-        }
+    private fun showKvizovi(list: List<Kviz>){
+        println("showKvizovi lista size je " + list.size)
+//        kvizAdapter = KvizAdapter(list.sortedBy { kviz -> kviz.datumPocetka }) { kviz -> otvoriKviz(kviz) }
+//        kvizoviRecyclerView.adapter = kvizAdapter
+
+        kvizAdapter.updateList(list.sortedBy { kviz -> kviz.datumPocetka })
     }
+
+    private fun otvoriKviz(kviz : Kviz){
+        pitanjeKvizViewModel.zapocniKviz(kviz, funcSucces = ::zapocniKviz, funcError = ::errorOtvaranjeKviza)
+
+    }
+    private fun zapocniKviz(pitanja : List<Pitanje>, kviz: Kviz, idKvizTaken: Int){
+        val nextFrag = FragmentPokusaj.newInstance(
+            pitanja,
+            kviz.id, kviz.naziv, kviz.nazivPredmeta, kviz.nazivGrupe,
+            idKvizTaken
+        )
+        requireActivity().supportFragmentManager.beginTransaction()
+            .replace(R.id.container, nextFrag, "FRAG_POKUSAJ")
+            .addToBackStack(null)
+            .commit()
+        val activity = activity as MainActivity
+        activity.hideMenuItems(arrayListOf(0, 1))
+    }
+    private fun errorOtvaranjeKviza(message: String){
+        Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+    }
+    //napravi ili nadji KVIZTAKEN,
+    //u svakom slucaju naci PITANJA za kviz, te poslati pitanja, naziv kviza, nazivpredmeta, nazivGrupe(???????)
+    //u fragment pokusaju -----initFragments() za pitanja sa odgovorima
+    //U fragment pokusaju na osnovu kvizTakena naci ODGOVORE, ako postoje na osnovu njih odluciti da li ce odgovoaranje biti disableano ili
+    //ne,
+// ako odgovori vec postoje obojiti broj pitanja i odgovore na pitanja
+    //itd.
 
 }

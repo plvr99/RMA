@@ -3,9 +3,10 @@ package ba.etf.rma21.projekat.data.models
 import android.os.Parcel
 import android.os.Parcelable
 
-class Pitanje(val naziv: String?, val tekst: String?, val opcije: List<String>?, val tacan: Int?) :
+class Pitanje(val id : Int, val naziv: String?, val tekstPitanja: String?, val opcije: List<String>?, val tacan: Int) :
     Parcelable {
     constructor(parcel: Parcel) : this(
+        parcel.readInt(),
         parcel.readString(),
         parcel.readString(),
         parcel.createStringArrayList(),
@@ -14,10 +15,11 @@ class Pitanje(val naziv: String?, val tekst: String?, val opcije: List<String>?,
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
+        parcel.writeInt(id)
         parcel.writeString(naziv)
-        parcel.writeString(tekst)
+        parcel.writeString(tekstPitanja)
         parcel.writeStringList(opcije)
-        parcel.writeInt(tacan!!)
+        parcel.writeInt(tacan)
     }
 
     override fun describeContents(): Int {

@@ -4,14 +4,16 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
-import ba.etf.rma21.projekat.data.models.Odgovor
-import ba.etf.rma21.projekat.view.FragmentKvizovi
-import ba.etf.rma21.projekat.view.FragmentPokusaj
-import ba.etf.rma21.projekat.view.FragmentPoruka
-import ba.etf.rma21.projekat.view.FragmentPredmeti
+import ba.etf.rma21.projekat.data.repositories.AccountRepository
+import ba.etf.rma21.projekat.data.repositories.PredmetIGrupaRepository
+import ba.etf.rma21.projekat.view.*
 import ba.etf.rma21.projekat.viewmodel.KvizViewModel
 import ba.etf.rma21.projekat.viewmodel.PitanjeKvizViewModel
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.launch
 
 
 class MainActivity : AppCompatActivity() {
@@ -37,11 +39,12 @@ class MainActivity : AppCompatActivity() {
                 R.id.predajKviz -> {
                     //prikazi rez
                     val frag = getVisibleFragment() as FragmentPokusaj
+                    // TODO: 1.6.2021 FIXATI Predavanje kviza, spremanje odgovorra etc
+                    sacuavajOdgovore(frag)
                     val string =
-                        "Završili ste kviz ${frag.nazivKviza} sa tačnosti ${frag.odgovor.procenatTacnosti * 100} %"
+                        "Završili ste kviz ${frag.nazivKviza} sa tačnosti ${frag.osvojeniBodovi} %"
                     val poruka = FragmentPoruka.newInstance(string)
-                    disableSelectionOdgovora(frag.odgovor)
-                    sacuvajOdgovor(frag.odgovor, true)
+//                    disableSelectionOdgovora(frag.pitanjaFragmenti)
                     hideMenuItems(arrayListOf(2, 3))
                     frag.navigacijaPitanja.menu.get(frag.navigacijaPitanja.menu.size()-1).isVisible = true
                     frag.childFragmentManager.beginTransaction().replace(R.id.framePitanje, poruka, "poruka").addToBackStack(null).commit()
@@ -49,7 +52,8 @@ class MainActivity : AppCompatActivity() {
                 }
                 R.id.zaustaviKviz -> {
                     //saqcuvaj odgovore
-                    sacuvajOdgovor((getVisibleFragment() as FragmentPokusaj).odgovor, false)
+                    // TODO: 1.6.2021 FIXATI Predavanje kviza, spremanje odgovorra etc
+                  //  sacuvajOdgovor((getVisibleFragment() as FragmentPokusaj).pitanjaFragmenti, false)
                     hideMenuItems(arrayListOf(2, 3))
                     while (supportFragmentManager.backStackEntryCount > 1) supportFragmentManager.popBackStackImmediate()
                     bottomNavigation.selectedItemId = R.id.kvizovi
@@ -59,6 +63,14 @@ class MainActivity : AppCompatActivity() {
             false
         }
 
+    private fun sacuavajOdgovore(fragmentPokusaj: FragmentPokusaj) {
+        for (i in fragmentPokusaj.pitanja.indices){
+            if (fragmentPokusaj.odgovori[i].odgovoreno == -1) {
+                fragmentPokusaj.sacuavajOdgovor(fragmentPokusaj.pitanja[i].id, -1)
+            }
+        }
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         outState.putInt("MENU_OPTION", bottomNavigation.selectedItemId)
@@ -67,12 +79,14 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        initAccount()
         bottomNavigation = findViewById(R.id.bottomNav)
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         bottomNavigation.selectedItemId = R.id.kvizovi
         val kvizFragment = FragmentKvizovi.newInstance()
         if (savedInstanceState == null) openFragment(kvizFragment, "FRAG_KVIZOVI")
         else bottomNavigation.selectedItemId = savedInstanceState.getInt("MENU_OPTION")
+
     }
 
     private fun openFragment(fragment: Fragment, tag: String) {
@@ -83,7 +97,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onBackPressed() {
-
+       //test()
         //ako je pokusaj sacuvaj odgovore pa zatvori
         if (getVisibleFragment() is FragmentPokusaj || getVisibleFragment() is FragmentKvizovi)
             return
@@ -107,15 +121,24 @@ class MainActivity : AppCompatActivity() {
         for (i in id) bottomNavigation.menu.get(i).isVisible = false
     }
 
-    private fun disableSelectionOdgovora(odgovor: Odgovor) {
-        //disableat ce svaki list view fragmenata
-        for (i in 0 until odgovor.pitanja.size)
-            odgovor.pitanja.get(i).zavrseno = true
+    // TODO: 1.6.2021 FIXATI FUNKCIJE ZA SPREMANJE ODGOVORA I DISABLEANJE
+//    private fun disableSelectionOdgovora(odgovor: Odgovor) {
+//        //disableat ce svaki list view fragmenata
+//        for (i in 0 until odgovor.pitanja.size)
+//            odgovor.pitanja.get(i).zavrseno = true
+//    }
+//
+    fun test() {
+        val scope = CoroutineScope(Job() + Dispatchers.Default)
+        scope.launch {
+            PredmetIGrupaRepository.upisiUGrupu(3)
+        }
+        //println("PLSSSSS"  + KvizRepository.kvizovi.size)
     }
-
-    private fun sacuvajOdgovor(odgovor: Odgovor, zavrseno: Boolean) {
-        odgovor.zavrseno = zavrseno
-        pitanjeKvizViewModel.dodajOdgovor(odgovor)
+    private fun initAccount(){
+        val scope = CoroutineScope(Job() + Dispatchers.Main)
+        scope.launch { println("POSTAVLJANJE HASHETA")
+            AccountRepository.postaviHash("ebad9b23-f0d6-4574-ac0b-3a6f320b20bd") }
     }
 }
 

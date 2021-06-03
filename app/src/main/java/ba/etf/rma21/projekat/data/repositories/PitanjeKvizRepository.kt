@@ -1,32 +1,51 @@
 package ba.etf.rma21.projekat.data.repositories
 
 import ba.etf.rma21.projekat.data.models.Pitanje
-import ba.etf.rma21.projekat.data.models.PitanjeKviz
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONException
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URL
 
 class PitanjeKvizRepository {
     companion object{
-        var lista : ArrayList<PitanjeKviz>
-        var pitanja : ArrayList<Pitanje>
-        init {
-            pitanja = arrayListOf(
-                Pitanje("P1","2+2=", arrayListOf("4","3","8"), 0),
-                Pitanje("P2","3+3=", arrayListOf("4","6","8"), 1),
-                Pitanje("P3","Formula za otpor R glasi:", arrayListOf("R = U * I","R = I / U","R = U / I"), 2),
-                Pitanje("P4","I KZ: ", arrayListOf("Zbir struja koje ulaze u cvor jednak je nuli",
-                    "Zbir struja koje ulaze u cvor jednak je zbiru struja koje izlaze iz cvora","Suma svih napona u konturi jednaa je nuli"), 1)
-            )
-            lista = arrayListOf(
-                PitanjeKviz("P1","Kviz 2", "IM1"), PitanjeKviz("P2","Kviz 2", "IM1"),
-                PitanjeKviz("P1","Kviz 1", "IM1"), PitanjeKviz("P2","Kviz 1", "IM1"),
-                PitanjeKviz("P3","Kviz 2", "OE"), PitanjeKviz("P4","Kviz 2", "OE")
-            )
-        }
-        fun getPitanja(nazivKviza: String, nazivPredmeta: String): List<Pitanje> {
-            return pitanja.filter { pitanje -> getNazivPitanjaKviz(nazivKviza, nazivPredmeta).contains(pitanje.naziv) }
-        }
-        private fun getNazivPitanjaKviz(nazivKviza: String, nazivPredmeta: String): List<String> {
-            return lista.filter { pitanjeKviz -> pitanjeKviz.kviz.equals(nazivKviza)
-                    && pitanjeKviz.nazivPredmeta.equals(nazivPredmeta)}.map { pitanjeKviz -> pitanjeKviz.naziv }
+        suspend fun getPitanja(idKviza:Int):List<Pitanje>{
+            return withContext(Dispatchers.IO) {
+                val url1 = "https://rma21-etf.herokuapp.com/kviz/$idKviza/pitanja"
+                try {
+                    val listaPitanja = mutableListOf<Pitanje>()
+                    val url = URL(url1)
+                    (url.openConnection() as? HttpURLConnection)?.run {
+                        val result = this.inputStream.bufferedReader().use { it.readText() }
+                        val items = JSONArray(result)
+                        for (i in 0 until items.length()) {
+                            val nesto = items.getJSONObject(i)
+                            val id = nesto.getInt("id")
+                            val naziv = nesto.getString("naziv")
+                            val tacan = nesto.getInt("tacan")
+                            val tekst = nesto.getString("tekstPitanja")
+                            val opcije = nesto.getJSONArray("opcije")
+                            val opcijePitanje : ArrayList<String> = ArrayList()
+                            for (j in 0 until opcije.length()){
+                                opcije.getString(j)
+                                opcijePitanje.add(opcije.getString(j))
+                            }
+                            listaPitanja.add(Pitanje(id, naziv,tekst,opcijePitanje,tacan))
+                        }
+                    }
+                    return@withContext listaPitanja
+                }
+                catch (e: MalformedURLException) {
+                    return@withContext emptyList<Pitanje>()
+                } catch (e: IOException) {
+                    return@withContext emptyList<Pitanje>()
+                } catch (e: JSONException) {
+                    return@withContext emptyList<Pitanje>()
+                }
+            }
         }
     }
 }

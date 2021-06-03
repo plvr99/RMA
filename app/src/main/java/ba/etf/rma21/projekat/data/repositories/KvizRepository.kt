@@ -1,73 +1,153 @@
 package ba.etf.rma21.projekat.data.repositories
 
 import ba.etf.rma21.projekat.data.models.Kviz
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.json.JSONArray
+import org.json.JSONException
+import org.json.JSONObject
+import java.io.IOException
+import java.net.HttpURLConnection
+import java.net.MalformedURLException
+import java.net.URL
 import java.util.*
 
 class KvizRepository {
 
     companion object {
-        var kvizovi : ArrayList<Kviz>
-        var mojiKvizovi : ArrayList<Kviz>
-        init {
-            kvizovi = arrayListOf(
-                    Kviz("Kviz 1","IM1", createDate(2021, 3, 2), createDate(2021, 8, 2), createDate(2021, 8, 3), 2, "Grupa 1",null),
-                    Kviz("Kviz 2","IM1", createDate(2021, 4, 1), createDate(2021, 8,2), createDate(2021, 8, 3), 3, "Grupa 2",null),
-                    Kviz("Kviz 1","ASP",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 2, "Grupa 1",2f),
-                    Kviz("Kviz 2","ASP",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 5, "Grupa 2",null),
-                    Kviz("Kviz 1","OE", createDate(2021, 9,10), createDate(2021, 9,10), createDate(2021, 9,10) ,4, "Grupa 1",null),
-                    Kviz("Kviz 2","OE", Calendar.getInstance().time, createDate(2021,7,22), createDate(2021,7,22) ,4, "Grupa 2",null),
-                    Kviz("Kviz 1","OOAD",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 2, "Grupa 1",0f),
-                    Kviz("Kviz 2","OOAD",Calendar.getInstance().time, Calendar.getInstance().time,Calendar.getInstance().time, 2, "Grupa 2",0.8f),
-                    Kviz("Kviz 1","DM", createDate(2021, 5,15),createDate(2021, 5,15), createDate(2021, 5,15), 5,"DM grupa 1", null),
-                    Kviz("Kviz 1","OBP", createDate(2021, 4,2),createDate(2021, 4,2), Calendar.getInstance().time, 5,"OBP grupa 1", null),
-                    Kviz("Kviz 1","RMA", createDate(2021, 3,15),createDate(2021, 3,15), createDate(2021, 3,15), 15,"RMA grupa 1", 2f),
-                    Kviz("Kviz 1","IEK", createDate(2021, 4,1),createDate(2021, 4,1), createDate(2021, 4,1), 10,"IEK grupa 1", 0.5f))
 
-            mojiKvizovi = arrayListOf(kvizovi.get(0), kvizovi.get(8), kvizovi.get(9), kvizovi.get(10), kvizovi.get(11))
-        }
-        fun dajNeupisaneKvizove(): List<Kviz> {
-            return kvizovi.filter { kviz -> !mojiKvizovi.contains(kviz) }
-        }
+        suspend fun getUpisani():List<Kviz>{
+            return withContext(Dispatchers.IO){
+                try {
+                    return@withContext getMyKvizes()
 
-        fun getMyKvizes(): List<Kviz> {
-            return mojiKvizovi
-        }
-
-        fun getAll(): List<Kviz> {
-            return kvizovi
-        }
-//        fun getDone(): List<Kviz> {
-//            return kvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz)==1 }
-//        }
-//
-//        fun getFuture(): List<Kviz> {
-//            return kvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz) == 3 }
-//        }
-//
-//        fun getNotTaken(): List<Kviz> {
-//            return kvizovi.filter { kviz: Kviz -> odrediTipKviza(kviz)== 4 }
-//        }
-        fun getDone(): List<Kviz> {
-            return mojiKvizovi.filter { kviz: Kviz -> kviz.odrediTipKviza()==1 }
-        }
-
-        fun getFuture(): List<Kviz> {
-            return mojiKvizovi.filter { kviz: Kviz -> kviz.odrediTipKviza() == 3 }
-        }
-
-        fun getNotTaken(): List<Kviz> {
-            return mojiKvizovi.filter { kviz: Kviz -> kviz.odrediTipKviza()== 4 }
-        }
-        fun createDate(year : Int, month: Int, day : Int) : Date{
-            return GregorianCalendar(year, month-1, day).getTime()
-        }
-
-        fun upisiKvizove(nazivPredmeta : String, grupa: String){
-            for (kviz in kvizovi){
-                if(kviz.nazivPredmeta.equals(nazivPredmeta) && kviz.nazivGrupe.equals(grupa)){
-                    mojiKvizovi.add(kviz)
+                } catch (e: MalformedURLException) {
+                    return@withContext emptyList<Kviz>()
+                } catch (e: IOException) {
+                    return@withContext emptyList<Kviz>()
+                } catch (e: JSONException) {
+                    return@withContext emptyList<Kviz>()
                 }
             }
+        }
+        suspend fun getMyKvizes(): List<Kviz> {
+            return withContext(Dispatchers.IO) {
+                val mojiKvizovi = arrayListOf<Kviz>()
+                try {
+                    val upisaneGrupe = PredmetIGrupaRepository.getUpisaneGrupe()
+                    println("upisane grupe size = " + upisaneGrupe.size)
+                    for (i in 0 until upisaneGrupe.size){
+                        val url1 = "https://rma21-etf.herokuapp.com/grupa/${upisaneGrupe[i].id}/kvizovi"
+                        val url = URL(url1)
+                        (url.openConnection() as? HttpURLConnection)?.run {
+                            val result = this.inputStream.bufferedReader().use { it.readText() }
+                            val items = JSONArray(result)
+                            val kvizovi = getAll()
+                            for (j in 0 until items.length()){
+                                val nesto = items.getJSONObject(j)
+                                val id = nesto.getInt("id")
+                                mojiKvizovi.add(kvizovi.find { kviz -> kviz.id == id }!!)
+                            }
+                        }
+                    }
+                    return@withContext mojiKvizovi
+                }catch (e: MalformedURLException) {
+                    return@withContext emptyList<Kviz>()
+                } catch (e: IOException) {
+                    return@withContext emptyList<Kviz>()
+                } catch (e: JSONException) {
+                    return@withContext emptyList<Kviz>()
+                }
+            }
+        }
+
+        suspend fun getAll(): List<Kviz> {
+            return withContext(Dispatchers.IO) {
+                val kvizovi = arrayListOf<Kviz>()
+                val url1 = "https://rma21-etf.herokuapp.com/kviz"
+                try {
+                    val url = URL(url1)
+                    (url.openConnection() as? HttpURLConnection)?.run {
+                        val result = this.inputStream.bufferedReader().use { it.readText() }
+                        println(result)
+                        val items = JSONArray(result)
+                        for (i in 0 until items.length()) {
+                            val nesto = items.getJSONObject(i)
+                            val id = nesto.getInt("id")
+                            val naziv = nesto.getString("naziv")
+                            val datum = nesto.getString("datumPocetak").split("-")
+                            val datumPocetka =
+                                createDate(datum[0].toInt(), datum[1].toInt(), datum[2].toInt())
+//                            val datumKraj = null
+                            val datumKraj = createDate(2022, 5,5)
+                            val trajanje = nesto.getInt("trajanje")
+                            val idKviza = nesto.getInt("id")
+                            val grupe = PredmetIGrupaRepository.dajGrupeSaIdem(idKviza)
+                            println("Broj pronadjenih grupa sa idem $idKviza je " + grupe.size)
+                            for (j in grupe.indices){
+                                kvizovi.add( Kviz(id, naziv, grupe[j].nazivPredmeta, datumPocetka, datumKraj, Calendar.getInstance().time, trajanje, grupe[j].naziv, null))
+                                // TODO: 2.6.2021 popraviti brek
+                                break
+                            }
+                        }
+                    }
+                    return@withContext kvizovi
+                }catch (e: MalformedURLException) {
+                    return@withContext emptyList<Kviz>()
+                } catch (e: IOException) {
+                    return@withContext emptyList<Kviz>()
+                } catch (e: JSONException) {
+                    return@withContext emptyList<Kviz>()
+                }
+            }
+        }
+        suspend fun getById(id:Int): Kviz? {
+            return withContext(Dispatchers.IO) {
+                var kviz: Kviz? = null
+                try {
+                    val url1 = "https://rma21-etf.herokuapp.com/kviz/$id"
+                    val url = URL(url1)
+                    (url.openConnection() as? HttpURLConnection)?.run {
+                        val result = this.inputStream.bufferedReader().use { it.readText() }
+                        val nesto = JSONObject(result)
+                        val id1 = nesto.getInt("id")
+                        val naziv = nesto.getString("naziv")
+                        val datum = nesto.getString("datumPocetka").split("-")
+                        val datumPocetka =
+                            createDate(datum[0].toInt(), datum[1].toInt(), datum[2].toInt())
+                        val datumKraj = null
+                        val trajanje = nesto.getInt("trajanje")
+                        val idKviza = nesto.getInt("id")
+                        val grupe = PredmetIGrupaRepository.dajGrupeSaIdem(idKviza)
+                        for (i in grupe.indices){
+                            kviz = Kviz(id1,naziv, grupe[i].nazivPredmeta, datumPocetka, datumKraj, Calendar.getInstance().time, trajanje, grupe[i].naziv, null)
+                            if (i == 0 ) break // da vrati prvi kviz sa prvom grupom
+                        }
+                    }
+                    return@withContext kviz
+                }catch (e: MalformedURLException) {
+                    return@withContext null
+                } catch (e: IOException) {
+                    return@withContext null
+                } catch (e: JSONException) {
+                    return@withContext null
+                }
+            }
+        }
+
+        suspend fun getDone(): List<Kviz> {
+            return getMyKvizes().filter { kviz: Kviz -> kviz.odrediTipKviza()==1 }
+        }
+
+        suspend fun getFuture(): List<Kviz> {
+            return getMyKvizes().filter { kviz: Kviz -> kviz.odrediTipKviza() == 3 }
+        }
+
+        suspend fun getNotTaken(): List<Kviz> {
+            return getMyKvizes().filter { kviz: Kviz -> kviz.odrediTipKviza()== 4 }
+        }
+        private fun createDate(year : Int, month: Int, day : Int) : Date{
+            return GregorianCalendar(year, month-1, day).time
         }
     }
 }
