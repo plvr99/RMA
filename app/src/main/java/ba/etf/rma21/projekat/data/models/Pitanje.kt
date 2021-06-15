@@ -2,14 +2,22 @@ package ba.etf.rma21.projekat.data.models
 
 import android.os.Parcel
 import android.os.Parcelable
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
 
-class Pitanje(val id : Int, val naziv: String?, val tekstPitanja: String?, val opcije: List<String>?, val tacan: Int) :
+@Entity
+class Pitanje(@PrimaryKey val id : Int,
+              @ColumnInfo(name = "naziv") val naziv: String?,
+              @ColumnInfo (name = "tekstPitanja") val tekstPitanja: String?,
+              @ColumnInfo (name = "opcije") val opcije: String?,
+              @ColumnInfo (name = "tacan") val tacan: Int) :
     Parcelable {
     constructor(parcel: Parcel) : this(
         parcel.readInt(),
         parcel.readString(),
         parcel.readString(),
-        parcel.createStringArrayList(),
+        parcel.readString(),
         parcel.readInt()
     ) {
     }
@@ -18,7 +26,7 @@ class Pitanje(val id : Int, val naziv: String?, val tekstPitanja: String?, val o
         parcel.writeInt(id)
         parcel.writeString(naziv)
         parcel.writeString(tekstPitanja)
-        parcel.writeStringList(opcije)
+        parcel.writeString(opcije)
         parcel.writeInt(tacan)
     }
 

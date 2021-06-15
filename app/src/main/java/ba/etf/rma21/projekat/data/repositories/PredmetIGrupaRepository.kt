@@ -1,5 +1,7 @@
 package ba.etf.rma21.projekat.data.repositories
 
+import android.content.Context
+import ba.etf.rma21.projekat.data.AppDatabase
 import ba.etf.rma21.projekat.data.models.Grupa
 import ba.etf.rma21.projekat.data.models.Predmet
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +16,12 @@ import java.net.URL
 
 class PredmetIGrupaRepository {
     companion object {
+        private lateinit var context:Context
+        lateinit var db : AppDatabase
+        fun setContext(_context: Context){
+            context=_context
+            db = AppDatabase.getInstance(context)
+        }
         var predmeti : ArrayList<Predmet> = arrayListOf()
         var upisaniPredmeti : ArrayList<Predmet> = arrayListOf() // dobija se iz upisanih grupa
         var grupe : ArrayList<Grupa> = arrayListOf()
@@ -44,6 +52,14 @@ class PredmetIGrupaRepository {
                 }
             }
         }
+        suspend fun getPredmetiDB() : List<Predmet>{
+            return withContext(Dispatchers.IO) {
+                if(DBRepository.updateNow()){
+                    AccountRepository.obnovaBaze(AccountRepository.getHash())
+                }
+                return@withContext db.predmetDao().getAllPredmet()
+            }
+        }
 //        fun dajNeupisanePredmete(): List<Predmet> {
 //            return PredmetRepository.predmeti.filter { predmet -> !PredmetRepository.upisaniPredmeti.contains(predmet) }
 //        }
@@ -67,7 +83,7 @@ class PredmetIGrupaRepository {
                             val naziv = nesto.getString("naziv")
                             val predmetId = nesto.getInt("PredmetId")
                             val nazivPredmet = getPredmetById(predmetId)!!.naziv
-                            grupe.add(Grupa(id, naziv, nazivPredmet))
+                            grupe.add(Grupa(id, naziv, nazivPredmet, predmetId))
                         }
                     }
                     return@withContext grupe
@@ -78,6 +94,14 @@ class PredmetIGrupaRepository {
                 } catch (e: JSONException) {
                     return@withContext emptyList<Grupa>()
                 }
+            }
+        }
+        suspend fun getGrupeDB(): List<Grupa>{
+            return withContext(Dispatchers.IO){
+                if(DBRepository.updateNow()){
+                    AccountRepository.obnovaBaze(AccountRepository.getHash())
+                }
+                return@withContext db.grupaDao().getAllGrupe()
             }
         }
         suspend fun getPredmetById(id: Int): Predmet?{
@@ -101,6 +125,14 @@ class PredmetIGrupaRepository {
                 }
             }
         }
+        suspend fun getPredmetByIdDB(id : Int) : Predmet{
+            return withContext(Dispatchers.IO) {
+                if (DBRepository.updateNow()) {
+                    AccountRepository.obnovaBaze(AccountRepository.getHash())
+                }
+                return@withContext db.predmetDao().getPredmetById(id)
+            }
+        }
         suspend fun getGrupeZaPredmet(idPredmeta: Int): List<Grupa> {
             return withContext(Dispatchers.IO) {
                 val grupeZaPredmet = arrayListOf<Grupa>()
@@ -114,7 +146,7 @@ class PredmetIGrupaRepository {
                             val nesto = items.getJSONObject(i)
                             val id = nesto.getInt("id")
                             val naziv = nesto.getString("naziv")
-                            grupeZaPredmet.add(Grupa(id, naziv, nazivPredmet))
+                            grupeZaPredmet.add(Grupa(id, naziv, nazivPredmet, idPredmeta))
                         }
                     }
                     return@withContext grupeZaPredmet
@@ -125,6 +157,14 @@ class PredmetIGrupaRepository {
                 } catch (e: JSONException) {
                     return@withContext emptyList<Grupa>()
                 }
+            }
+        }
+        suspend fun getGrupeZaPredmetDB(idPredmeta: Int) : List<Grupa>{
+            return withContext(Dispatchers.IO) {
+                if (DBRepository.updateNow()) {
+                    AccountRepository.obnovaBaze(AccountRepository.getHash())
+                }
+                return@withContext db.grupaDao().getgrupeByPredmetId(idPredmeta)
             }
         }
 
@@ -140,7 +180,10 @@ class PredmetIGrupaRepository {
                         val result = this.inputStream.bufferedReader().use { it.readText() }
                         val rezultat = JSONObject(result)
                         val poruka = rezultat.getString("message")
-                        if (poruka.contains("je dodan u grupu")) return@withContext true
+                        if (poruka.contains("je dodan u grupu")) {
+                            AccountRepository.obnovaBaze(AccountRepository.getHash())
+                            return@withContext true
+                        }
                     }
                     return@withContext false
                 } catch (e: MalformedURLException) {
@@ -167,7 +210,7 @@ class PredmetIGrupaRepository {
                             val naziv = nesto.getString("naziv")
                             val predmetId = nesto.getInt("PredmetId")
                             val predmet = getPredmetById(predmetId)
-                            grupe.add(Grupa(id1, naziv, predmet!!.naziv))
+                            grupe.add(Grupa(id1, naziv, predmet!!.naziv, predmetId))
                         }
                     }
                     return@withContext grupe
@@ -202,7 +245,7 @@ class PredmetIGrupaRepository {
                                 upisaniPredmeti.add(it)
                                 nazivPredmet = it.naziv
                             }
-                            upisaneGrupe.add(Grupa(id, naziv, nazivPredmet))
+                            upisaneGrupe.add(Grupa(id, naziv, nazivPredmet, predmetId))
                         }
                     }
                     return@withContext upisaneGrupe
@@ -215,10 +258,23 @@ class PredmetIGrupaRepository {
                 }
             }
         }
+        suspend fun getUpisaneGrupeDB() : List<Grupa>{
+            return withContext(Dispatchers.IO){
+                if (DBRepository.updateNow()) {
+                    AccountRepository.obnovaBaze(AccountRepository.getHash())
+                }
+                // U BAZI SE SAMO NALAZE UPISANE GRUPE
+                return@withContext db.grupaDao().getAllGrupe()
+            }
+        }
         suspend fun getNeupisaneGrupe(): List<Grupa>{
             return withContext(Dispatchers.IO) {
                 try {
-                    val lista = getGrupe() - getUpisaneGrupe()
+                    if (DBRepository.updateNow()) {
+                        AccountRepository.obnovaBaze(AccountRepository.getHash())
+                    }
+                    val lista = getGrupe() - getUpisaneGrupeDB()
+                    println("GET NEUPISANE GRUPE POZVAN: " + lista)
                     return@withContext lista
                 } catch (e: MalformedURLException) {
                     return@withContext emptyList<Grupa>()
@@ -229,12 +285,18 @@ class PredmetIGrupaRepository {
                 }
             }
         }
+
         suspend fun getNeupisanePredmete(): List<Predmet>{
             return withContext(Dispatchers.IO) {
                 try {
-                    getUpisaneGrupe()
-                    val lista = getPredmeti() - upisaniPredmeti
-                    return@withContext lista
+                    val predmeti = arrayListOf<Predmet>()
+                    val grupe = getNeupisaneGrupe()
+                    for (i in grupe.indices) {
+                        val predmet = getPredmetByIdDB(grupe[i].predmetId)
+                        if(!predmeti.contains(predmet)) predmeti.add(predmet)
+                    }
+                    println("GET NEUPISANI PREDMETI POZVANI: " +predmeti)
+                    return@withContext predmeti
                 } catch (e: MalformedURLException) {
                     return@withContext emptyList<Predmet>()
                 } catch (e: IOException) {

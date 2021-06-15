@@ -9,8 +9,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import ba.etf.rma21.projekat.R
 import ba.etf.rma21.projekat.data.models.Kviz
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 class KvizAdapter(private var kvizovi : List<Kviz>, private val onItemClicked: (kviz:Kviz)->Unit) : RecyclerView.Adapter<KvizAdapter.KvizViewHolder>() {
 
@@ -47,14 +45,18 @@ class KvizAdapter(private var kvizovi : List<Kviz>, private val onItemClicked: (
 
     private fun postaviSlikuIDatum(tip : Int , holder: KvizViewHolder, kviz : Kviz){
         val context: Context = holder.image.context
-        val sd = SimpleDateFormat("dd.MM.yyyy")
-        var dateFormat  = DateFormat.getDateInstance(DateFormat.DATE_FIELD).format(kviz.datumPocetka)
+        var dateFormat  = ""
         val boje : List<String> = arrayListOf("","plava", "zelena","zuta","crvena")
+        dateFormat = kviz.datumPocetka.split("T")[0]
         when (tip) {
-            1 -> dateFormat = sd.format(kviz.datumRada)
-            2 -> dateFormat = sd.format(kviz.datumKraj)
-            3 -> dateFormat = sd.format(kviz.datumPocetka)
-            4 -> dateFormat = sd.format(kviz.datumKraj)
+//            1 -> dateFormat = sd.format(kviz.datumRada)
+//            2 -> dateFormat = sd.format(kviz.datumKraj)
+//            3 -> dateFormat = sd.format(kviz.datumPocetka)
+//            4 -> dateFormat = sd.format(kviz.datumKraj)
+            1 -> dateFormat = kviz.datumRada.split("T")[0]
+            2 -> dateFormat = kviz.datumKraj?.split("T")?.get(0) ?: ""
+            3 -> dateFormat = kviz.datumPocetka.split("T")[0]
+            4 -> dateFormat = kviz.datumKraj?.split("T")?.get(0) ?: ""
         }
         val id=context.resources
             .getIdentifier(boje.get(tip), "drawable", context.packageName)

@@ -44,7 +44,7 @@ class FragmentPitanje : Fragment() {
         val adapterOdgovori= object : ArrayAdapter<String>(
             view.context!!,
             android.R.layout.simple_list_item_1,
-            pitanje!!.opcije!!
+            pitanje!!.opcije!!.split(",")
         )
         {
             override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {

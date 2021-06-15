@@ -4,8 +4,7 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
 import androidx.fragment.app.Fragment
-import ba.etf.rma21.projekat.data.repositories.AccountRepository
-import ba.etf.rma21.projekat.data.repositories.PredmetIGrupaRepository
+import ba.etf.rma21.projekat.data.repositories.*
 import ba.etf.rma21.projekat.view.*
 import ba.etf.rma21.projekat.viewmodel.KvizViewModel
 import ba.etf.rma21.projekat.viewmodel.PitanjeKvizViewModel
@@ -18,7 +17,8 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
     private lateinit var bottomNavigation: BottomNavigationView
-    var pitanjeKvizViewModel: PitanjeKvizViewModel = PitanjeKvizViewModel()
+    private val  kvizViewModel = KvizViewModel()
+    private val pitanjeKvizViewModel = PitanjeKvizViewModel()
     private val mOnNavigationItemSelectedListener =
         BottomNavigationView.OnNavigationItemSelectedListener { item ->
             when (item.itemId) {
@@ -69,6 +69,8 @@ class MainActivity : AppCompatActivity() {
                 fragmentPokusaj.sacuavajOdgovor(fragmentPokusaj.pitanja[i].id, -1)
             }
         }
+        // TODO: 15.6.2021 ovdje treba uploadat na server
+        pitanjeKvizViewModel.predajOdgovore(fragmentPokusaj.kvizId, fragmentPokusaj.osvojeniBodovi)
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -79,10 +81,19 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        initAccount()
+       // initAccount()
         bottomNavigation = findViewById(R.id.bottomNav)
         bottomNavigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
         bottomNavigation.selectedItemId = R.id.kvizovi
+        AccountRepository.setContext(applicationContext)
+        DBRepository.setContext(applicationContext)
+        OdgovorRepository.setContext(applicationContext)
+        PredmetIGrupaRepository.setContext(applicationContext)
+        if (intent == null) println("NULLLLLLLLLLLLLLLL")
+        val payload = intent?.getStringExtra("payload")
+        if(payload.equals(null)) kvizViewModel.postaviHash("ebad9b23-f0d6-4574-ac0b-3a6f320b20bd")
+        else kvizViewModel.postaviHash(payload!!)
+
         val kvizFragment = FragmentKvizovi.newInstance()
         if (savedInstanceState == null) openFragment(kvizFragment, "FRAG_KVIZOVI")
         else bottomNavigation.selectedItemId = savedInstanceState.getInt("MENU_OPTION")
@@ -128,13 +139,13 @@ class MainActivity : AppCompatActivity() {
 //            odgovor.pitanja.get(i).zavrseno = true
 //    }
 //
-    fun test() {
-        val scope = CoroutineScope(Job() + Dispatchers.Default)
-        scope.launch {
-            PredmetIGrupaRepository.upisiUGrupu(3)
-        }
-        //println("PLSSSSS"  + KvizRepository.kvizovi.size)
-    }
+//    fun test() {
+//        val scope = CoroutineScope(Job() + Dispatchers.Default)
+//        scope.launch {
+//            PredmetIGrupaRepository.upisiUGrupu(3)
+//        }
+//        //println("PLSSSSS"  + KvizRepository.kvizovi.size)
+//    }
     private fun initAccount(){
         val scope = CoroutineScope(Job() + Dispatchers.Main)
         scope.launch { println("POSTAVLJANJE HASHETA")

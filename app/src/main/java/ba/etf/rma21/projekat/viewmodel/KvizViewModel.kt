@@ -3,6 +3,8 @@ package ba.etf.rma21.projekat.viewmodel
 import ba.etf.rma21.projekat.data.models.Grupa
 import ba.etf.rma21.projekat.data.models.Kviz
 import ba.etf.rma21.projekat.data.models.Predmet
+import ba.etf.rma21.projekat.data.repositories.AccountRepository
+import ba.etf.rma21.projekat.data.repositories.DBRepository
 import ba.etf.rma21.projekat.data.repositories.KvizRepository
 import ba.etf.rma21.projekat.data.repositories.PredmetIGrupaRepository
 import kotlinx.coroutines.CoroutineScope
@@ -30,12 +32,15 @@ class KvizViewModel() {
             val grupa = PredmetIGrupaRepository.getGrupe().find { grupa -> grupa.naziv.equals(grupaa) &&
                     grupa.nazivPredmeta.equals(predmett)}
             PredmetIGrupaRepository.upisiUGrupu(grupa!!.id)
+            if(DBRepository.updateNow()){
+                AccountRepository.obnovaBaze(AccountRepository.getHash())
+            }
         }
 
     }
 
     fun getAllPredmets(populateWithPredmet : (predmeti: List<Predmet>) -> Unit){
-        scope.launch {  populateWithPredmet.invoke(PredmetIGrupaRepository.getPredmeti())}
+        scope.launch {  populateWithPredmet.invoke(PredmetIGrupaRepository.getPredmetiDB())}
     }
     fun dajNeupisanePredmete(populateWithPredmet : (predmeti: List<Predmet>) -> Unit) {
         scope.launch {  populateWithPredmet.invoke(PredmetIGrupaRepository.getNeupisanePredmete())}
@@ -56,7 +61,7 @@ class KvizViewModel() {
 
     }
     fun getMyKvizes(showKvizovi: (kvizovi: List<Kviz>) -> Unit){
-        scope.launch { val lista = KvizRepository.getMyKvizes()
+        scope.launch { val lista = KvizRepository.getMyKvizesDB()
             println("Get My kvisez called lista size = "  + lista.size)
             showKvizovi.invoke(lista)
         }
@@ -83,6 +88,13 @@ class KvizViewModel() {
     fun getNotTaken(showKvizovi: (kvizovi: List<Kviz>) -> Unit){
         scope.launch { val lista = KvizRepository.getNotTaken()
             showKvizovi.invoke(lista)
+        }
+    }
+
+    fun postaviHash(acHash: String){
+        scope.launch {
+            val rez = AccountRepository.postaviHash(acHash)
+            // TODO: 11.6.2021 NAPRAVITI FUNKCIJU ZA ERROR
         }
     }
 

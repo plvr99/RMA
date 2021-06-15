@@ -63,6 +63,7 @@ class FragmentPredmeti : Fragment() {
             override fun onItemSelected(
                 parent: AdapterView<*>?, view: View?, position: Int, id: Long
             ) {
+                Toast.makeText(context, "Ucitavanje...", Toast.LENGTH_SHORT).show()
                 KvizViewModel.odabranaGodina = position
                 adapterPredmet.clear()
                 adapterGrupa.clear()

@@ -26,7 +26,7 @@ class FragmentPokusaj : Fragment() {
     private lateinit var pitanjeFrame : FrameLayout
     lateinit var pitanja : List<Pitanje>
     var pitanjeKvizViewModel : PitanjeKvizViewModel = PitanjeKvizViewModel()
-    private var kvizId: Int = 0
+    var kvizId: Int = 0
     lateinit var nazivKviza : String
     private lateinit var nazivPredmeta : String
     private lateinit var nazivGrupe : String
@@ -61,7 +61,7 @@ class FragmentPokusaj : Fragment() {
             nazivGrupe = it.getString("nazivGrupe")!!
             idKvizTaken = it.getInt("idKvizTaken")
         }
-        pitanjeKvizViewModel.getOdgovoriKviz(kvizId, funcReturn = ::dajOdgovore)
+        pitanjeKvizViewModel.getOdgovoriKviz(idKvizTaken, funcReturn = ::dajOdgovore)
 
 //            if (pitanjeKvizViewModel.pronadjiOdgovorZaKviz(nazivKviza, nazivPredmeta, nazivGrupe) != null){
 //                pitanjeKvizViewModel.pronadjiOdgovorZaKviz(nazivKviza, nazivPredmeta, nazivGrupe)!!
@@ -121,8 +121,7 @@ class FragmentPokusaj : Fragment() {
         val fragmenti : ArrayList<FragmentPitanje> = arrayListOf()
 
         val a = pitanja.withIndex().associate { it.value.id to it.index }
-        odgovori = odgovori.sortedBy { a.get(it.id) }
-
+        odgovori = odgovori.sortedBy { a.get(it.pitanjeId) }
 
         for (i in odgovori.indices) fragmenti.add(FragmentPitanje.newInstance(pitanja.get(i), odgovori.get(i), zavrseno))
         return fragmenti
@@ -133,14 +132,14 @@ class FragmentPokusaj : Fragment() {
         odgovori1.addAll(odgovori)
         for (i in pitanja.indices){
             val id = pitanja[i].id
-            if(odgovori1.find { odgovor -> odgovor.id == id } == null) odgovori1.add(Odgovor(id, -1))
+            if(odgovori1.find { odgovor -> odgovor.pitanjeId == id } == null) odgovori1.add(Odgovor(null, id, idKvizTaken, -1))
         }
         return odgovori1
     }
 
     private fun napraviOdgvore(pitanja: List<Pitanje>): List<Odgovor> {
         val odgovori = arrayListOf<Odgovor>()
-        for (i in pitanja.indices) odgovori.add(Odgovor(pitanja[i].id, -1))
+        for (i in pitanja.indices) odgovori.add(Odgovor(null, pitanja[i].id, idKvizTaken, -1))
         return odgovori
     }
 

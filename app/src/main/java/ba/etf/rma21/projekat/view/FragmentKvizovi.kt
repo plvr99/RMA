@@ -17,6 +17,7 @@ import ba.etf.rma21.projekat.data.models.Kviz
 import ba.etf.rma21.projekat.data.models.Pitanje
 import ba.etf.rma21.projekat.viewmodel.KvizViewModel
 import ba.etf.rma21.projekat.viewmodel.PitanjeKvizViewModel
+import java.text.SimpleDateFormat
 
 class FragmentKvizovi : Fragment() {
     private lateinit var kvizoviRecyclerView: RecyclerView
@@ -81,8 +82,9 @@ class FragmentKvizovi : Fragment() {
         println("showKvizovi lista size je " + list.size)
 //        kvizAdapter = KvizAdapter(list.sortedBy { kviz -> kviz.datumPocetka }) { kviz -> otvoriKviz(kviz) }
 //        kvizoviRecyclerView.adapter = kvizAdapter
-
-        kvizAdapter.updateList(list.sortedBy { kviz -> kviz.datumPocetka })
+        val format = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+        // TODO: 13.6.2021 POPRAVITI BUG SA DATUMOM
+        kvizAdapter.updateList(list.sortedBy { kviz -> kviz.datumPocetka})
     }
 
     private fun otvoriKviz(kviz : Kviz){

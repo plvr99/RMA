@@ -1,4 +1,10 @@
 package ba.etf.rma21.projekat.data.models
 
-class PitanjeKviz( val naziv : String,  val kviz: String,  val nazivPredmeta : String) {
-}
+import androidx.room.ColumnInfo
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity
+data class PitanjeKviz(@PrimaryKey(autoGenerate = true) val id : Int?,
+                        @ColumnInfo (name = "KvizId") val kvizId: Int,
+                        @ColumnInfo (name = "PitanjeId") val pitanjeId : Int)
